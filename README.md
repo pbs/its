@@ -185,6 +185,33 @@ Image as a JPG with a quality of 20:
 
 ---
 
+## Blur
+
+Blur returns an image subject to a [Gaussian Blur](https://en.wikipedia.org/wiki/Gaussian_blur). To use it, use the `blur` keyword with an integer (for the pixel radius of the blur) as an argument:
+
+> https://image.pbs.org/path/to/file.jpg?blur=radius
+
+Where:
+
+- blur -- indicates that ITS should perform a blur transform
+- radius -- an integer pixel value representing the desired radius of the blur effect
+
+Example
+
+Original Image:
+
+> https://image.pbs.org/test/7Sy3rBL-asset-mezzanine-16x9-xMYNIn3.jpg
+
+![Macaroons](https://image.pbs.org/test/7Sy3rBL-asset-mezzanine-16x9-xMYNIn3.jpg)
+
+Blurred Image:
+
+> https://image.pbs.org/test/7Sy3rBL-asset-mezzanine-16x9-xMYNIn3.jpg?blur=10
+
+![Macaroons](https://image.pbs.org/test/7Sy3rBL-asset-mezzanine-16x9-xMYNIn3.jpg?blur=10)
+
+---
+
 ## Combination
 
 All of the transforms described above can be combined into one query by separating them with `&`.
