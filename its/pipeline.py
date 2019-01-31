@@ -8,7 +8,12 @@ from typing import Dict, Union
 from PIL.JpegImagePlugin import JpegImageFile
 from PIL.PngImagePlugin import PngImageFile
 
-from .transformations import FitTransform, OverlayTransform, ResizeTransform
+from .transformations import (
+    BlurTransform,
+    FitTransform,
+    OverlayTransform,
+    ResizeTransform,
+)
 
 
 def process_transforms(
@@ -28,7 +33,7 @@ def process_transforms(
         query["fit"] = query.pop("crop")
 
     img_info = img.info
-    transform_order = [ResizeTransform, FitTransform, OverlayTransform]
+    transform_order = [BlurTransform, ResizeTransform, FitTransform, OverlayTransform]
 
     # loop through the order dict and apply the transforms
     for transform in transform_order:

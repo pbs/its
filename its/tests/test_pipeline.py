@@ -398,6 +398,37 @@ class TestPipelineEndToEnd(TestCase):
         assert response.status_code == 200
         assert response.mimetype == "image/png"
 
+    def test_valid_blur_request(self):
+        response = self.client.get("tests/images/test.jpeg?blur=100")
+        assert response.status_code == 200
+
+    def test_blur_zero_value_parity(self):
+        old_style_response = self.client.get("tests/images/test.png")
+        new_style_response = self.client.get("tests/images/test.png?blur=0")
+        comparison = compare_pixels(
+            Image.open(BytesIO(old_style_response.data)),
+            Image.open(BytesIO(new_style_response.data)),
+        )
+
+        self.assertEqual(comparison, 1)
+
+    def test_blur_non_parity(self):
+        old_style_response = self.client.get("tests/images/test.png")
+        new_style_response = self.client.get("tests/images/test.png?blur=1")
+        comparison = compare_pixels(
+            Image.open(BytesIO(old_style_response.data)),
+            Image.open(BytesIO(new_style_response.data)),
+        )
+        self.assertLessEqual(comparison, self.threshold)
+
+    def test_invalid_blur_request_alpha_value(self):
+        response = self.client.get("tests/images/test.jpeg?blur=a")
+        assert response.status_code == 400
+
+    def test_invalid_blur_request_no_value(self):
+        response = self.client.get("tests/images/test.jpeg?blur=")
+        assert response.status_code == 400
+
 
 if __name__ == "__main__":
     unittest.main()
