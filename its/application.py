@@ -31,7 +31,7 @@ if SENTRY_DSN:
     SENTRY = Sentry(APP, dsn=SENTRY_DSN, logging=True, level=logging.ERROR)
 
 
-def process_request(namespace: str, query: Dict[str, str], filename: str) -> Response:
+def _normalize_query(query: Dict[str, str]) -> Dict[str, str]:
     fit_synonyms = {"crop", "focalcrop"}
     if len((fit_synonyms | {"fit"}) & set(query.keys())) > 1:
         raise ITSClientError("use only one of these synonyms: fit, crop, focalcrop")
@@ -40,6 +40,12 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
         if fit_snynonym in query:
             query["fit"] = query[fit_snynonym]
             del query[fit_snynonym]
+
+    return query
+
+
+def process_request(namespace: str, query: Dict[str, str], filename: str) -> Response:
+    query = _normalize_query(query)
 
     if namespace not in NAMESPACES:
         abort(
