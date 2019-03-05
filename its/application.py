@@ -76,7 +76,16 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
         mime_type = MIME_TYPES[result.format.upper()]
 
         output = BytesIO()
-        result.save(output, format=result.format.upper())
+
+        save_params = {"format": result.format.upper()}
+        # if an image has an icc profile, we make sure to save it in the output
+        # https://en.wikipedia.org/wiki/ICC_profile
+        # http://www.color.org/v4spec.xalter
+        # https://www.iso.org/standard/54754.html
+        if image.info.get("icc_profile"):
+            save_params["icc_profile"] = image.info["icc_profile"]
+
+        result.save(output, **save_params)
 
     # our images are cacheable for one year
     # NOTE this would be the right place to do clever things like:
