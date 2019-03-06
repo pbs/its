@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 from PIL import Image, ImageFile
 from PIL.JpegImagePlugin import JpegImageFile
 from PIL.PngImagePlugin import PngImageFile
+from PIL import ImageCms
 
 from its.settings import DEFAULT_JPEG_QUALITY, PNGQUANT_PATH
 

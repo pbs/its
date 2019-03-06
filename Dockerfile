@@ -13,8 +13,10 @@ RUN apk add --no-cache \
     g++ \
     gcc \
     jpeg-dev \
+    lcms2-dev \
     libffi-dev \
     libmemcached-dev \
+    libwebp-dev \
     libxslt-dev \
     linux-headers \
     make \
@@ -23,9 +25,8 @@ RUN apk add --no-cache \
     openssl-dev \
     pngquant \
     py-lxml \
-    zlib-dev \
     python3-dev \
-    libwebp-dev \
+    zlib-dev \
   && rm /bin/sh \
   && ln -s /bin/bash /bin/sh
 
