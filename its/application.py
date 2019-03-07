@@ -11,6 +11,7 @@ from raven.contrib.flask import Sentry
 
 from its.errors import ITSClientError, NotFoundError
 from its.loader import loader
+from its.normalize import normalize
 from its.optimize import optimize
 from its.pipeline import process_transforms
 from its.settings import MIME_TYPES
@@ -63,6 +64,7 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
         output = image
         mime_type = MIME_TYPES["SVG"]
     else:
+        image = normalize(image)
         image.info["filename"] = filename
         result = process_transforms(image, query)
 

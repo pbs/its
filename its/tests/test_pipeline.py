@@ -380,6 +380,18 @@ class TestPipelineEndToEnd(TestCase):
         assert response.status_code == 200
         assert response.mimetype == "image/jpeg"
 
+    def test_icc_profile_maintained(self):
+        response = self.client.get("tests/images/jpeg_with_icc_profile.jpg")
+        assert response.status_code == 200
+        assert response.mimetype == "image/jpeg"
+        actual = Image.open(BytesIO(response.data))
+        expected = Image.open(
+            self.img_dir / "expected/jpeg_with_icc_profile_target.jpg"
+        )
+        comparison = compare_pixels(expected, actual)
+        self.assertGreaterEqual(comparison, self.threshold)
+        assert "icc_profile" not in actual.info
+
     def test_focalcrop_parity(self):
         old_style_response = self.client.get(
             "tests/images/test.png.focalcrop.767x421.50.10.png"
