@@ -74,7 +74,6 @@ resource "aws_appautoscaling_policy" "its_web_scale_up" {
 
     step_adjustment {
       metric_interval_lower_bound = 0
-      metric_interval_upper_bound = -1
       scaling_adjustment          = 8
     }
   }
@@ -96,7 +95,6 @@ resource "aws_appautoscaling_policy" "its_web_scale_down" {
     metric_aggregation_type = "Average"
 
     step_adjustment {
-      metric_interval_lower_bound = -1
       metric_interval_upper_bound = 0
       scaling_adjustment          = -1
     }
