@@ -1,4 +1,4 @@
-import tempfile
+import io
 
 from PIL import Image, ImageCms
 
@@ -6,10 +6,10 @@ from PIL import Image, ImageCms
 def normalize(image: Image) -> Image:
     if "icc_profile" in image.info:
         fmt = image.format
-        icc = tempfile.mkstemp(suffix=".icc")[1]
-        with open(icc, "wb") as icc_file:
-            icc_file.write(image.info["icc_profile"])
-        srgb = ImageCms.createProfile("sRGB")
-        image = ImageCms.profileToProfile(image, icc, srgb, outputMode="RGB")
+        input_icc_profile = io.BytesIO(image.info["icc_profile"])
+        output_icc_profile = ImageCms.createProfile("sRGB")
+        image = ImageCms.profileToProfile(
+            image, input_icc_profile, output_icc_profile, outputMode="RGB"
+        )
         image.format = fmt
     return image
