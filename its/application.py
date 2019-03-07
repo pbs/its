@@ -32,7 +32,7 @@ if SENTRY_DSN:
     SENTRY = Sentry(APP, dsn=SENTRY_DSN, logging=True, level=logging.ERROR)
 
 
-def process_request(namespace: str, query: Dict[str, str], filename: str) -> Response:
+def _normalize_query(query: Dict[str, str]) -> Dict[str, str]:
     fit_synonyms = {"crop", "focalcrop"}
     if len((fit_synonyms | {"fit"}) & set(query.keys())) > 1:
         raise ITSClientError("use only one of these synonyms: fit, crop, focalcrop")
@@ -41,6 +41,12 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
         if fit_snynonym in query:
             query["fit"] = query[fit_snynonym]
             del query[fit_snynonym]
+
+    return query
+
+
+def process_request(namespace: str, query: Dict[str, str], filename: str) -> Response:
+    query = _normalize_query(query)
 
     if namespace not in NAMESPACES:
         abort(
@@ -78,7 +84,16 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
         mime_type = MIME_TYPES[result.format.upper()]
 
         output = BytesIO()
-        result.save(output, format=result.format.upper())
+
+        save_params = {"format": result.format.upper()}
+        # if an image has an icc profile, we make sure to save it in the output
+        # https://en.wikipedia.org/wiki/ICC_profile
+        # http://www.color.org/v4spec.xalter
+        # https://www.iso.org/standard/54754.html
+        if image.info.get("icc_profile"):
+            save_params["icc_profile"] = image.info["icc_profile"]
+
+        result.save(output, **save_params)
 
     # our images are cacheable for one year
     # NOTE this would be the right place to do clever things like:
