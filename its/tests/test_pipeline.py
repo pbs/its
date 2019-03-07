@@ -380,7 +380,7 @@ class TestPipelineEndToEnd(TestCase):
         assert response.status_code == 200
         assert response.mimetype == "image/jpeg"
 
-    def test_icc_profile_maintained(self):
+    def test_icc_profile_converted(self):
         response = self.client.get("tests/images/jpeg_with_icc_profile.jpg")
         assert response.status_code == 200
         assert response.mimetype == "image/jpeg"
