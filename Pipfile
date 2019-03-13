@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 flask = "*"
-pillow = "*"
+pillow = ">=5.3.0, <5.4.0" # https://github.com/python-pillow/Pillow/issues/3557#issuecomment-465470777
 "boto3" = "*"
 requests = "*"
 uwsgi = "*"

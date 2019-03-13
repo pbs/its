@@ -17,6 +17,11 @@ ImageFile.MAXBLOCK = 2 ** 20  # for JPG progressive saving
 
 
 def identify_best_format(img: Image.Image) -> str:
+    if img.format == "PNG" and img.mode in ["RGBA", "LA"]:
+        # this is a png image with an alpha channel.
+        # jpeg doesn't preserve transparency, this must remain a png.
+        return "png"
+
     identical_pixel_threshold = 0.001
     common_values_threshold = 50
     hist = img.histogram()
