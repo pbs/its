@@ -4,10 +4,11 @@ import logging
 from io import BytesIO
 from typing import Dict, Optional
 
-from flask import Flask, Response, abort, redirect, request
+from flask import Flask, abort, redirect, request
 from flask_cors import CORS
 from PIL import ImageFile
 from raven.contrib.flask import Sentry
+from werkzeug import Response
 
 from its.errors import ITSClientError, NotFoundError
 from its.loader import loader
