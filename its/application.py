@@ -12,6 +12,7 @@ from werkzeug import Response
 
 from its.errors import ITSClientError, NotFoundError
 from its.loader import loader
+from its.normalize import normalize
 from its.optimize import optimize
 from its.pipeline import process_transforms
 from its.settings import MIME_TYPES
@@ -70,6 +71,7 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
         output = image
         mime_type = MIME_TYPES["SVG"]
     else:
+        image = normalize(image)
         image.info["filename"] = filename
         result = process_transforms(image, query)
 
@@ -84,15 +86,7 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
 
         output = BytesIO()
 
-        save_params = {"format": result.format.upper()}
-        # if an image has an icc profile, we make sure to save it in the output
-        # https://en.wikipedia.org/wiki/ICC_profile
-        # http://www.color.org/v4spec.xalter
-        # https://www.iso.org/standard/54754.html
-        if image.info.get("icc_profile"):
-            save_params["icc_profile"] = image.info["icc_profile"]
-
-        result.save(output, **save_params)
+        result.save(output, format=result.format.upper())
 
     # our images are cacheable for one year
     # NOTE this would be the right place to do clever things like:
