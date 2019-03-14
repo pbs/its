@@ -16,7 +16,7 @@ from .errors import ITSClientError, ITSTransformError
 ImageFile.MAXBLOCK = 2 ** 20  # for JPG progressive saving
 
 
-def extract_pixels(img: Image.Image) -> List[Tuple]:
+def extract_pixels(img: Image.Image) -> List[List[Tuple[int]]]:
     pixels = list(img.getdata())
     width, height = img.size
     pixel_rows = []
