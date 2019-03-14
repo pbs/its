@@ -374,6 +374,11 @@ class TestPipelineEndToEnd(TestCase):
         assert response.status_code == 200
         assert response.mimetype == "image/png"
 
+    def test_auto_format_complex_opaque_png(self):
+        response = self.client.get("tests/images/seagull.png?format=auto")
+        assert response.status_code == 200
+        assert response.mimetype == "image/jpeg"
+
     def test_cache_control_on_200(self):
         response = self.client.get("tests/images/test.jpeg?format=auto")
         assert response.status_code == 200

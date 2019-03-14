@@ -3,7 +3,7 @@ import uuid
 from math import floor
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from PIL import Image, ImageFile
 from PIL.JpegImagePlugin import JpegImageFile
@@ -16,9 +16,32 @@ from .errors import ITSClientError, ITSTransformError
 ImageFile.MAXBLOCK = 2 ** 20  # for JPG progressive saving
 
 
+def extract_pixels(img: Image.Image) -> List[Tuple]:
+    pixels = list(img.getdata())
+    width, height = img.size
+    pixel_rows = []
+    for i in range(height):
+        start = i * width
+        end = (i + 1) * width
+        pixel_rows.append(pixels[start:end])
+    return pixel_rows
+
+
+def has_transparent_background(img: PngImageFile) -> bool:
+    if img.mode not in ["RGBA", "LA"]:
+        # no alpha channel, can't have a transparent background
+        return False
+    pixel_rows = extract_pixels(img)
+    for row in pixel_rows:
+        for pix in row:
+            if pix in ((0, 0, 0, 0), (0, 0)):
+                # this is a transparent pixel
+                return True
+    return False
+
+
 def identify_best_format(img: Image.Image) -> str:
-    if img.format == "PNG" and img.mode in ["RGBA", "LA"]:
-        # this is a png image with an alpha channel.
+    if img.format == "PNG" and has_transparent_background(img):
         # jpeg doesn't preserve transparency, this must remain a png.
         return "png"
 
