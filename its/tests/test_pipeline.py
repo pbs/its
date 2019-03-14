@@ -375,7 +375,7 @@ class TestPipelineEndToEnd(TestCase):
         assert response.mimetype == "image/png"
 
     def test_auto_format_complex_opaque_png(self):
-        response = self.client.get("tests/images/seagull.png?format=auto")
+        response = self.client.get("tests/images/opaque_with_alpha.png?format=auto")
         assert response.status_code == 200
         assert response.mimetype == "image/jpeg"
 
