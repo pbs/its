@@ -11,7 +11,7 @@ from PIL import Image
 
 import its.errors
 from its.application import APP
-from its.optimize import optimize
+from its.optimize import has_transparent_background, optimize
 from its.pipeline import process_transforms
 
 
@@ -373,6 +373,13 @@ class TestPipelineEndToEnd(TestCase):
         response = self.client.get("tests/images/transparent_complex.png?format=auto")
         assert response.status_code == 200
         assert response.mimetype == "image/png"
+
+    def test_transparent_png_with_icc(self):
+        response = self.client.get("tests/images/transparent_complex_with_icc.png")
+        assert response.status_code == 200
+        assert response.mimetype == "image/png"
+        response_image = Image.open(BytesIO(response.data))
+        assert has_transparent_background(response_image)
 
     def test_auto_format_complex_opaque_png(self):
         response = self.client.get("tests/images/opaque_with_alpha.png?format=auto")
