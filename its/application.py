@@ -6,7 +6,7 @@ from typing import Dict, Optional
 
 from flask import Flask, abort, redirect, request
 from flask_cors import CORS
-from PIL import ImageFile
+from PIL import ImageFile, JpegImagePlugin
 from raven.contrib.flask import Sentry
 from werkzeug import Response
 
@@ -22,6 +22,10 @@ from .util import get_redirect_location
 
 # https://stackoverflow.com/questions/12984426/python-pil-ioerror-image-file-truncated-with-big-images
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+# workaround for https://github.com/python-pillow/Pillow/issues/1138
+# without this hack, pillow misidenfifies some jpeg files as "mpo" files
+JpegImagePlugin._getmp = lambda x: None  # noqa
 
 APP = Flask(__name__)
 
