@@ -75,7 +75,7 @@ def optimize(img: Image.Image, query: Dict[str, str]) -> Image.Image:
             ext = "jpeg"
 
         # convert first, then optimize
-        if ext.lower() == "jpeg":
+        if ext.lower() in ("jpeg", "mpo"):
             # convert to JPG and/or compress
             # need to convert to RGB first, then can save in any format
             if img.mode == "RGBA":

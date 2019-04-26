@@ -2,13 +2,12 @@ from io import BytesIO
 from pathlib import Path, PosixPath
 from typing import Union
 
-from enforce import runtime_validation
 from PIL import Image
 from PIL.JpegImagePlugin import JpegImageFile
+from PIL.MpoImagePlugin import MpoImageFile
 from PIL.PngImagePlugin import PngImageFile
 
 from ..errors import NotFoundError
-from ..settings import ENFORCE_TYPE_CHECKS
 from ..util import validate_image_type
 from .base import BaseLoader
 
@@ -18,11 +17,10 @@ class FileSystemLoader(BaseLoader):
     slug = "file_system"
     parameter_name = "folders"
 
-    @runtime_validation(enabled=ENFORCE_TYPE_CHECKS)
     @staticmethod
     def load_image(
         namespace: str, filename: Union[PosixPath, str]
-    ) -> Union[JpegImageFile, PngImageFile]:
+    ) -> Union[JpegImageFile, PngImageFile, MpoImageFile]:
         """
         Loads image from child folder of the git project folder serverless-its/
         """
@@ -40,7 +38,6 @@ class FileSystemLoader(BaseLoader):
 
         return image
 
-    @runtime_validation(enabled=ENFORCE_TYPE_CHECKS)
     @staticmethod
     def get_fileobj(namespace: str, filename: str) -> BytesIO:
         """

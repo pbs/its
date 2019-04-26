@@ -4,15 +4,11 @@ import os
 # Set DEBUG = True to enable debugging application.
 DEBUG = os.environ.get("ITS_DEBUG", "false").lower() == "true"
 
-# We don't want to enforce type checks in production environments (probably)
-ENFORCE_TYPE_CHECKS = (
-    os.environ.get("ITS_ENFORCE_TYPE_CHECKS", "false").lower() == "true"
-)
-
 MIME_TYPES = {
     "PNG": "image/png",
     "JPEG": "image/jpeg",
     "JPG": "image/jpeg",
+    "MPO": "image/jpeg",
     "WEBP": "image/webp",
     "SVG": "image/svg+xml",
 }
