@@ -458,6 +458,14 @@ class TestPipelineEndToEnd(TestCase):
         response = self.client.get("tests/images/test.jpeg?blur=")
         assert response.status_code == 400
 
+    def test_psuedo_mpo(self):
+        # some jpegs are recognized by Pillow as MPO files:
+        # https://github.com/python-pillow/Pillow/issues/1138
+        # tests/images/psuedo-mpo.jpeg is one such, make sure we handle it as a jpeg
+        response = self.client.get("tests/images/psuedo-mpo.jpeg")
+        assert response.status_code == 200
+        assert response.mimetype == "image/jpeg"
+
 
 if __name__ == "__main__":
     unittest.main()
