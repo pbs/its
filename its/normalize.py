@@ -2,6 +2,12 @@ import io
 
 from PIL import Image, ImageCms
 
+# LOGGER = logging.getLogger(__name__)
+
+
+class NormalizationError(Exception):
+    pass
+
 
 def normalize(image: Image) -> Image:
     output_mode = "RGB"
@@ -12,8 +18,11 @@ def normalize(image: Image) -> Image:
         fmt = image.format
         input_icc_profile = io.BytesIO(image.info["icc_profile"])
         output_icc_profile = ImageCms.createProfile("sRGB")
-        image = ImageCms.profileToProfile(
-            image, input_icc_profile, output_icc_profile, outputMode=output_mode
-        )
+        try:
+            image = ImageCms.profileToProfile(
+                image, input_icc_profile, output_icc_profile, outputMode=output_mode
+            )
+        except ImageCms.PyCMSError:
+            raise NormalizationError("failed to transform icc profile")
         image.format = fmt
     return image

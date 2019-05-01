@@ -12,7 +12,7 @@ from werkzeug import Response
 
 from its.errors import ITSClientError, NotFoundError
 from its.loader import loader
-from its.normalize import normalize
+from its.normalize import NormalizationError, normalize
 from its.optimize import optimize
 from its.pipeline import process_transforms
 from its.settings import MIME_TYPES
@@ -28,6 +28,8 @@ APP = Flask(__name__)
 # enable cors headers on all routes
 # https://flask-cors.corydolphin.com/en/latest/api.html#extension
 CORS(APP, origins=CORS_ORIGINS)
+
+LOGGER = logging.getLogger(__name__)
 
 if SENTRY_DSN:
     SENTRY = Sentry(APP, dsn=SENTRY_DSN, logging=True, level=logging.ERROR)
@@ -71,7 +73,10 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
         output = image
         mime_type = MIME_TYPES["SVG"]
     else:
-        image = normalize(image)
+        try:
+            image = normalize(image)
+        except NormalizationError as err:
+            LOGGER.warning("failed to normalize %s/%s: %s", namespace, filename, err)
         image.info["filename"] = filename
         result = process_transforms(image, query)
 
