@@ -8,8 +8,6 @@ pylint:
 
 pep8:
   full: true
-  disable:
-    - N805
 
 ignore-paths:
   - terraform
