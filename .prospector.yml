@@ -1,11 +1,6 @@
 strictness: veryhigh
 max-line-length: 99
 
-pylint:
-  disable:
-    # the focalcrop route makes it hard to lint too-many-arguments
-    - too-many-arguments
-
 pep8:
   full: true
 

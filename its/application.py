@@ -108,7 +108,7 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
     )
 
 
-def process_old_request(
+def process_old_request(  # pylint: disable=too-many-arguments
     transform: str,
     width: Optional[int] = None,
     height: Optional[int] = None,
@@ -157,7 +157,7 @@ def crop(namespace: str, filename: str, width: int, height: int, ext: str) -> Re
 @APP.route(
     "/<namespace>/<path:filename>.focalcrop.<int:width>x<int:height>."
     + "<int(min=0,max=100):x_coordinate>.<int(min=0,max=100):y_coordinate>.<ext>"
-)
+)  # pylint: disable=too-many-arguments
 def focalcrop(
     namespace: str,
     filename: str,
