@@ -458,6 +458,15 @@ class TestPipelineEndToEnd(TestCase):
         response = self.client.get("tests/images/test.jpeg?blur=")
         assert response.status_code == 400
 
+    def test_untransformable_icc_profile(self):
+        # if we're unable to transform an image with an icc profile to sRGB,
+        # we remove the icc profile and hope for the best
+        response = self.client.get("tests/images/untransformable.jpg")
+        assert response.status_code == 200
+        assert response.mimetype == "image/jpeg"
+        image = Image.open(BytesIO(response.data))
+        assert "icc_profile" not in image.info
+
 
 if __name__ == "__main__":
     unittest.main()
