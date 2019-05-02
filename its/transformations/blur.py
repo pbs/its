@@ -16,7 +16,7 @@ class BlurTransform(BaseTransform):
     def derive_parameters(query: str) -> Sequence[str]:
         return re.split(DELIMITERS_RE, query)
 
-    def apply_transform(img, parameters):
+    def apply_transform(self, img, parameters):
         """
         Blurs the image from value passed in parameters
         """

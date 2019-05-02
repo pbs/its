@@ -4,10 +4,6 @@ max-line-length: 99
 pylint:
   disable:
     - arguments-differ
-    - logging-not-lazy
-    - no-self-argument
-    - self-cls-assignment
-    - too-few-public-methods
     # the focalcrop route makes it hard to lint too-many-arguments
     - too-many-arguments
     - useless-object-inheritance

@@ -40,7 +40,7 @@ def process_transforms(
         slug = transform.slug
         if slug in query:
             parameters = transform.derive_parameters(query[slug])
-            img = transform.apply_transform(img, parameters)
+            img = transform().apply_transform(img, parameters)
 
     if img.format is None and "filename" in img_info.keys():
         # attempt to grab the filetype from the filename
