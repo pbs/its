@@ -3,7 +3,7 @@ from typing import Sequence, Union
 from PIL import Image
 
 
-class BaseTransform(object):
+class BaseTransform:
 
     """
     Generic image transform type class

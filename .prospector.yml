@@ -3,10 +3,8 @@ max-line-length: 99
 
 pylint:
   disable:
-    - arguments-differ
     # the focalcrop route makes it hard to lint too-many-arguments
     - too-many-arguments
-    - useless-object-inheritance
 
 pep8:
   full: true
