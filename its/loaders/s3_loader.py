@@ -29,7 +29,7 @@ class S3Loader(BaseLoader):
 
         config = NAMESPACES[namespace]
         path = config.get("path", namespace).strip("/")
-        key = "{path}/{filename}".format(path=path, filename=filename)
+        key = "{path}/{filename}".format(path=path, filename=filename).strip("/")
         bucket_name = config[S3Loader.parameter_name]
         s3_object = s3_resource.Object(bucket_name=bucket_name, key=key)
 
