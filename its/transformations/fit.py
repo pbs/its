@@ -101,14 +101,11 @@ class FitTransform(BaseTransform):
                     img, crop_width, crop_height, focal_x, focal_y
                 )
             except ITSTransformError as error:
-                LOGGER.error(
+                error_string = (
                     "Fit Transform with requested size %sx%s"
-                    + "and requested focal point [%s, %s] failed.",
-                    crop_width,
-                    crop_height,
-                    focal_x,
-                    focal_y,
+                    + " and requested focal point [%s, %s] failed."
                 )
+                LOGGER.error(error_string, crop_width, crop_height, focal_x, focal_y)
                 raise error
 
         elif crop_height == 0:

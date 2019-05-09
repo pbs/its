@@ -17,7 +17,7 @@ class ResizeTransform(BaseTransform):
     def derive_parameters(query: str) -> Sequence[str]:
         return re.split(DELIMITERS_RE, query)
 
-    def apply_transform(img, parameters):
+    def apply_transform(self, img, parameters):
         """
         Resizes input image while maintaining aspect ratio.
         """

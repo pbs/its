@@ -14,6 +14,26 @@ LOGGER = logging.getLogger(__name__)
 OVERLAY_PROPORTION = 0.2
 
 
+def get_loader(overlay_loader):
+
+    loader_classes = BaseLoader.__subclasses__()
+
+    loader = [loader for loader in loader_classes if loader.slug == overlay_loader]
+
+    if not loader:
+        raise ITSTransformError(
+            "Not Found Error: Overlay Image Loader "
+            + "with slug '%s' not found." % overlay_loader
+        )
+    elif len(loader) > 1:
+        raise ITSTransformError(
+            "Configuration Error: Two or more Image Loaders "
+            + "have slug '%s'." % overlay_loader
+        )
+
+    return loader
+
+
 class OverlayTransform(BaseTransform):
 
     """
@@ -29,7 +49,7 @@ class OverlayTransform(BaseTransform):
         # overlay transform does not take parameters, so we don't split this
         return [query]
 
-    def apply_transform(img, parameters):
+    def apply_transform(self, img, parameters):
         if not parameters:
             raise ITSClientError("no overlay image supplied")
 
@@ -41,7 +61,7 @@ class OverlayTransform(BaseTransform):
             raise ITSClientError("no overlay image supplied")
 
         if "overlay" in NAMESPACES:
-            loader = OverlayTransform.get_loader(NAMESPACES["overlay"]["loader"])
+            loader = get_loader(NAMESPACES["overlay"]["loader"])
         else:
             raise ConfigError("No Backend has been set up for overlays.")
 
@@ -77,24 +97,4 @@ class OverlayTransform(BaseTransform):
             resized_overlay, (padding_top, padding_left), mask=resized_overlay
         )
 
-        img = new_img
-        return img
-
-    def get_loader(overlay_loader):
-
-        loader_classes = BaseLoader.__subclasses__()
-
-        loader = [loader for loader in loader_classes if loader.slug == overlay_loader]
-
-        if not loader:
-            raise ITSTransformError(
-                "Not Found Error: Overlay Image Loader "
-                + "with slug '%s' not found." % overlay_loader
-            )
-        elif len(loader) > 1:
-            raise ITSTransformError(
-                "Configuration Error: Two or more Image Loaders "
-                + "have slug '%s'." % overlay_loader
-            )
-
-        return loader
+        return new_img

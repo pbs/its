@@ -1,7 +1,7 @@
 from typing import Union
 
 
-class BaseLoader(object):
+class BaseLoader:
     """
     Generic file loader class
     """
