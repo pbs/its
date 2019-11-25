@@ -25,7 +25,7 @@ def get_loader(overlay_loader):
             "Not Found Error: Overlay Image Loader "
             + "with slug '%s' not found." % overlay_loader
         )
-    elif len(loader) > 1:
+    if len(loader) > 1:
         raise ITSTransformError(
             "Configuration Error: Two or more Image Loaders "
             + "have slug '%s'." % overlay_loader
