@@ -41,7 +41,7 @@ class HTTPLoader(BaseLoader):
                     namespace=namespace, filename=filename
                 )
             )
-        elif response.status_code != 200:
+        if response.status_code != 200:
             raise ITSLoaderError(
                 "{code} from http backend for {namespace}/{filename}".format(
                     code=response.status_code, namespace=namespace, filename=filename
