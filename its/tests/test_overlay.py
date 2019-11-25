@@ -1,7 +1,12 @@
 import os
+from io import BytesIO
 from unittest import TestCase
 
+from PIL import Image
+
 from its.application import APP
+
+from .test_pipeline import compare_pixels
 
 
 class TestOverlay(TestCase):
@@ -52,10 +57,12 @@ class TestOverlay(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             "images/expected/seagull.jpg.resize.100x100.passport.png",
         )
-        with open(expected_image_path, "rb") as infile:
-            expected_data = infile.read()
 
-        assert expected_data == response.data
+        comparison = compare_pixels(
+            Image.open(expected_image_path), Image.open(BytesIO(response.data))
+        )
+
+        self.assertGreaterEqual(comparison, 0.99)
 
     def test_overlay_image_resize_500_bytes(self):
         response = self.client.get(
@@ -65,7 +72,9 @@ class TestOverlay(TestCase):
             os.path.dirname(os.path.abspath(__file__)),
             "images/expected/seagull.jpg.resize.500x500.passport.png",
         )
-        with open(expected_image_path, "rb") as infile:
-            expected_data = infile.read()
 
-        assert expected_data == response.data
+        comparison = compare_pixels(
+            Image.open(expected_image_path), Image.open(BytesIO(response.data))
+        )
+
+        self.assertGreaterEqual(comparison, 0.99)
