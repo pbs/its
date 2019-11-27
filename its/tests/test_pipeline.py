@@ -467,6 +467,24 @@ class TestPipelineEndToEnd(TestCase):
         image = Image.open(BytesIO(response.data))
         assert "icc_profile" not in image.info
 
+    def test_progressive_jpeg(self):
+        # thanks to http://techslides.com/detecting-progressive-jpeg for this method
+        def is_progressive(buffer):
+            prog_jpeg_header_marker = b"\xff\xc2"
+            prog_jpeg_scan_start_marker = b"\xff\xda"
+            buffer.seek(0)
+            content = buffer.read()
+            if not content.find(prog_jpeg_header_marker):
+                return False
+            if content.count(prog_jpeg_scan_start_marker) < 2:
+                return False
+            return True
+
+        response = self.client.get("tests/images/seagull.jpg")
+        assert response.mimetype == "image/jpeg"
+        buffer = BytesIO(response.data)
+        assert is_progressive(buffer)
+
 
 if __name__ == "__main__":
     unittest.main()
