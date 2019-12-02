@@ -95,7 +95,12 @@ def process_request(namespace: str, query: Dict[str, str], filename: str) -> Res
 
         output = BytesIO()
 
-        result.save(output, format=result.format.upper())
+        if result.format.upper() in ("JPEG", "JPG"):
+            result.save(
+                output, format=result.format.upper(), progressive=True, optimize=True
+            )
+        else:
+            result.save(output, format=result.format.upper())
 
     # our images are cacheable for one year
     # NOTE this would be the right place to do clever things like:
