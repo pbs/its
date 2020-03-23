@@ -147,9 +147,6 @@ def process_old_request(  # pylint: disable=too-many-arguments
 
     return query
 
-@APP.route('/debug-sentry')
-def trigger_error():
-    division_by_zero = 1 / 0
 
 @APP.route("/<namespace>/<path:filename>", methods=["GET"])
 def transform_image(namespace: str, filename: str) -> Response:
