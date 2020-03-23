@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import logging
+import sentry_sdk
 from io import BytesIO
 from typing import Dict, Optional
 
 from flask import Flask, abort, redirect, request
 from flask_cors import CORS
 from PIL import ImageFile, JpegImagePlugin
-from raven.contrib.flask import Sentry
 from werkzeug import Response
 
 from its.errors import ITSClientError, NotFoundError
@@ -19,6 +19,8 @@ from its.settings import MIME_TYPES
 
 from .settings import CORS_ORIGINS, NAMESPACES, SENTRY_DSN
 from .util import get_redirect_location
+
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 # https://stackoverflow.com/questions/12984426/python-pil-ioerror-image-file-truncated-with-big-images
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -36,7 +38,10 @@ CORS(APP, origins=CORS_ORIGINS)
 LOGGER = logging.getLogger(__name__)
 
 if SENTRY_DSN:
-    SENTRY = Sentry(APP, dsn=SENTRY_DSN, logging=True, level=logging.ERROR)
+    sentry_sdk.init(
+        SENTRY_DSN,
+        integrations=[FlaskIntegration()]
+    )
 
 
 def _normalize_query(query: Dict[str, str]) -> Dict[str, str]:
@@ -142,6 +147,9 @@ def process_old_request(  # pylint: disable=too-many-arguments
 
     return query
 
+@APP.route('/debug-sentry')
+def trigger_error():
+    division_by_zero = 1 / 0
 
 @APP.route("/<namespace>/<path:filename>", methods=["GET"])
 def transform_image(namespace: str, filename: str) -> Response:
