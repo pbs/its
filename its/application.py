@@ -4,10 +4,11 @@ import logging
 from io import BytesIO
 from typing import Dict, Optional
 
+import sentry_sdk
 from flask import Flask, abort, redirect, request
 from flask_cors import CORS
 from PIL import ImageFile, JpegImagePlugin
-from raven.contrib.flask import Sentry
+from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug import Response
 
 from its.errors import ITSClientError, NotFoundError
@@ -36,7 +37,7 @@ CORS(APP, origins=CORS_ORIGINS)
 LOGGER = logging.getLogger(__name__)
 
 if SENTRY_DSN:
-    SENTRY = Sentry(APP, dsn=SENTRY_DSN, logging=True, level=logging.ERROR)
+    sentry_sdk.init(SENTRY_DSN, integrations=[FlaskIntegration()])
 
 
 def _normalize_query(query: Dict[str, str]) -> Dict[str, str]:

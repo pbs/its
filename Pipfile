@@ -10,7 +10,7 @@ pillow = ">=6.2.0" # https://nvd.nist.gov/vuln/detail/CVE-2019-16865
 requests = "*"
 uwsgi = "*"
 larson = "*"
-raven = {extras = ["flask"]}
+sentry-sdk = {extras = ["flask"]}
 newrelic = "*"
 enforce = "*"
 flask-cors = "*"
