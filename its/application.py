@@ -36,8 +36,23 @@ CORS(APP, origins=CORS_ORIGINS)
 
 LOGGER = logging.getLogger(__name__)
 
+
+def before_send(event, hint):
+    if "log_record" in hint:
+        log_record = hint["log_record"]
+        # don't send errors for requests that are not image resources(ex: mp4 files, pdf files)
+        try:
+            if "cannot identify image file" in log_record.getMessage():
+                return None
+        except AttributeError:
+            return event
+    return event
+
+
 if SENTRY_DSN:
-    sentry_sdk.init(SENTRY_DSN, integrations=[FlaskIntegration()])
+    sentry_sdk.init(
+        SENTRY_DSN, before_send=before_send, integrations=[FlaskIntegration()]
+    )
 
 
 def _normalize_query(query: Dict[str, str]) -> Dict[str, str]:
