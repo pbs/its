@@ -14,6 +14,7 @@ def normalize(image: Image) -> Image:
     # if the image has an alpha channel, preserve it
     if image.mode in ("RGBA", "LA"):
         output_mode = "RGBA"
+        image = image.convert("RGBA")
     if "icc_profile" in image.info:
         fmt = image.format
         input_icc_profile = io.BytesIO(image.info["icc_profile"])
