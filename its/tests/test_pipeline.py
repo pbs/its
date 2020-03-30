@@ -23,6 +23,7 @@ def get_pixels(image):
 
     return pixels
 
+
 # for colored images with alpha pixel pair is like (r, g, b, a)
 # for white/black images with alpha pixel pair is like (90, 91)
 
@@ -33,7 +34,10 @@ def compare_pixels(img1, img2, tolerance=0, is_white_or_black_image=False):
         number_of_color_indices = 1
 
     def pixel_matches(pixel1, pixel2, tolerance):
-        matching_vals = [abs(pixel1[i] - pixel2[i]) <= tolerance for i in range(number_of_color_indices)]
+        matching_vals = [
+            abs(pixel1[i] - pixel2[i]) <= tolerance
+            for i in range(number_of_color_indices)
+        ]
         return all(matching_vals)
 
     img1_pixels = get_pixels(img1)
@@ -417,7 +421,9 @@ class TestPipelineEndToEnd(TestCase):
         assert "icc_profile" not in actual.info
 
     def test_white_transparent_background_converted(self):
-        response = self.client.get("tests/images/white_image_with_transparent_background.png")
+        response = self.client.get(
+            "tests/images/white_image_with_transparent_background.png"
+        )
         assert response.status_code == 200
         assert response.mimetype == "image/png"
         actual = Image.open(BytesIO(response.data))
