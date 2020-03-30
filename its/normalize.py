@@ -12,11 +12,12 @@ class NormalizationError(Exception):
 def normalize(image: Image) -> Image:
     output_mode = "RGB"
     # if the image has an alpha channel, preserve it
+    # since for an image with alpha channel convert does not preserve its format we will extract it before this operation
+    fmt = image.format
     if image.mode in ("RGBA", "LA"):
         output_mode = "RGBA"
         image = image.convert("RGBA")
     if "icc_profile" in image.info:
-        fmt = image.format
         input_icc_profile = io.BytesIO(image.info["icc_profile"])
         output_icc_profile = ImageCms.createProfile("sRGB")
         try:
@@ -25,5 +26,5 @@ def normalize(image: Image) -> Image:
             )
         except ImageCms.PyCMSError:
             raise NormalizationError("failed to transform icc profile")
-        image.format = fmt
+    image.format = fmt
     return image
