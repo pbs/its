@@ -14,7 +14,6 @@ class TestCorsHeaders(TestCase):
         resp = self.client.get(
             "tests/images/test.png", headers=[["Origin", "www.example.com"]]
         )
-        print(resp)
         assert resp.headers.get("Access-Control-Allow-Origin") == "www.example.com"
 
         resp = self.client.get(
