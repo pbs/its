@@ -5,6 +5,7 @@ Script to validate images being submitted for transformation.
 import logging
 
 from flask import request
+from PIL.Image import DecompressionBombError
 
 from .errors import (
     ConfigError,
@@ -14,7 +15,6 @@ from .errors import (
 )
 from .loaders import BaseLoader
 from .settings import NAMESPACES
-from PIL.Image import DecompressionBombError
 
 LOGGER = logging.getLogger(__name__)
 
@@ -69,7 +69,9 @@ def loader(namespace, filename):
         )
     except DecompressionBombError:
         raise ITSClientError(
-            "{ns}/{fn}  is too large. Please use a smaller one".format(ns=namespace, fn=filename)
+            "{ns}/{fn}  is too large. Please use a smaller one".format(
+                ns=namespace, fn=filename
+            )
         )
 
     return image
