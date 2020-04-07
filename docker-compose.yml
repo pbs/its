@@ -10,7 +10,7 @@ services:
       - PIPENV_DONT_LOAD_ENV=1
       - SHELL=/bin/bash
       - ITS_ENFORCE_TYPE_CHECKS=true
-    env_file: .env
+#    env_file: .env
     stdin_open: true
     ports:
       - "5000:5000"
