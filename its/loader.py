@@ -5,6 +5,7 @@ Script to validate images being submitted for transformation.
 import logging
 
 from flask import request
+from PIL.Image import DecompressionBombError
 
 from .errors import (
     ConfigError,
@@ -65,6 +66,12 @@ def loader(namespace, filename):
     except ITSInvalidImageFileError:
         raise ITSClientError(
             "{ns}/{fn} is not a supported file type".format(ns=namespace, fn=filename)
+        )
+    except DecompressionBombError:
+        raise ITSClientError(
+            "{ns}/{fn}  is too large. Please use a smaller one".format(
+                ns=namespace, fn=filename
+            )
         )
 
     return image
