@@ -29,6 +29,12 @@ class TestClientErrorHandling(TestCase):
         assert response.status_code == 400
         assert "tests/images/not-an-image.jpg is not an image file" in body
 
+    def test_large_image_file(self):
+        response = self.client.get("/tests/images/large.jpg")
+        body = response.data.decode("utf-8")
+        assert response.status_code == 400
+        assert "tests/images/large.jpg  is too large. Please use a smaller one" in body
+
     def test_no_cache_headers_on_400(self):
         response = self.client.get("/tests/images/not-an-image.jpg")
         assert response.status_code == 400
