@@ -9,7 +9,7 @@ variable "environment" {
 }
 
 variable "s3_buckets" {
-  type        = list(string)
+  type        = list
   description = "names for the S3 buckets ITS will use to store images"
 }
 
@@ -50,7 +50,7 @@ variable "ecs_service_autoscale_role_arn" {
 }
 
 variable "vpc_subnet_ids" {
-  type        = list(string)
+  type        = list
   description = "ids of subnets to which the load balancer should be attached"
 }
 
@@ -65,7 +65,14 @@ variable "container_scaling_limit" {
 }
 
 variable "private_subnets" {
-  type        = list(string)
+  type        = list
   description = "ids of subnets to which the load balancer should be attached"
 }
+
+variable "cluster_name" {
+}
+
+variable "cluster_arn" {
+}
+
 
