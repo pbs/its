@@ -13,7 +13,6 @@
             }
         }
 
-
         stage('Build') {
             steps {
                 echo 'Building Docker Container...'
