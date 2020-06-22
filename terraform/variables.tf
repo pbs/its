@@ -69,10 +69,5 @@ variable "private_subnets" {
   description = "ids of subnets to which the load balancer should be attached"
 }
 
-variable "cluster_name" {
-}
-
-variable "cluster_arn" {
-}
 
 
