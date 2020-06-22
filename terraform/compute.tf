@@ -11,8 +11,7 @@ data "template_file" "web_task_def" {
     log_group_region = "${var.aws_region}"
     log_group_name   = "${aws_cloudwatch_log_group.web.name}"
     hostname         = "its-${var.environment}"
-    image_repo       = "${var.image_repo}"
-    image_tag        = "${var.image_tag}"
+    image_repo       = "${aws_ecr_repository.its_ecr.repository_url}"
 
     parameter_path = "${join("", slice(split("parameter", var.parameter_store_path_arn), 1, 2))}"
   }
@@ -37,10 +36,16 @@ resource "aws_ecs_service" "web" {
   deployment_minimum_healthy_percent = 50
 
   load_balancer {
-    target_group_arn = "${aws_alb_target_group.its.id}"
-    container_name   = "web"
-    container_port   = "5000"
+    target_group_arn = aws_alb_target_group.urs_target_group.arn
+    container_name   = "its-${var.environment}"
+    container_port   = 5000
   }
+
+   network_configuration {
+    security_groups = ["${var.its_sg}"]
+    subnets         = var.private_subnets
+  }
+
 
   # ignore changes to desired count so that deployments won't reset us to our minimum
   lifecycle {

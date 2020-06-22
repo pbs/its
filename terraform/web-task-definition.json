@@ -6,7 +6,7 @@
         "exec ./scripts/docker/server/run-server.sh"
     ],
     "essential": true,
-    "image": "${image_repo}:${image_tag}",
+    "image": "${image_repo}",
     "hostname": "${hostname}",
     "logConfiguration": {
         "logDriver": "awslogs",

@@ -83,7 +83,7 @@ resource "aws_security_group_rule" "its_lb_to_cluster" {
   to_port   = 65535
 
   source_security_group_id = "${aws_security_group.its_lb.id}"
-  security_group_id        = "${var.cluster_instance_sg}"
+  security_group_id        = "${var.its_sg}"
 }
 
 resource "aws_alb" "its" {

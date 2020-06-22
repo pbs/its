@@ -19,14 +19,9 @@ variable "aws_region" {
   description = "the name of the AWS region in which to create resources"
 }
 
-variable "image_tag" {
-  type        = "string"
-  description = "docker image tag for ITS image"
-}
 
 variable "image_repo" {
   type        = "string"
-  default     = "pbsd/its"
   description = "docker repository name for ITS image"
 }
 
@@ -65,7 +60,7 @@ variable "vpc_subnet_ids" {
   description = "ids of subnets to which the load balancer should be attached"
 }
 
-variable "cluster_instance_sg" {
+variable "its_sg" {
   type        = "string"
   description = "security group id for ECS cluster instances"
 }
@@ -73,4 +68,9 @@ variable "cluster_instance_sg" {
 variable "container_scaling_limit" {
   default     = 8
   description = "limit to the autoscaling behavior of the ECS service"
+}
+
+variable "private_subnets" {
+  type        = "list"
+  description = "ids of subnets to which the load balancer should be attached"
 }
