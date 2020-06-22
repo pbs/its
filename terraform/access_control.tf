@@ -16,6 +16,7 @@ resource "aws_iam_role" "its_task" {
   "Version": "2008-10-17"
 }
 EOF
+
 }
 
 # putMetricData permissions to * is dumb, but according to AWS docs it's not
@@ -25,7 +26,7 @@ EOF
 # https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/iam-access-control-overview-cw.html
 resource "aws_iam_role_policy" "its" {
   name = "its-${var.environment}-app-policy"
-  role = "${aws_iam_role.its_task.name}"
+  role = aws_iam_role.its_task.name
 
   policy = <<EOF
 {
@@ -52,12 +53,13 @@ resource "aws_iam_role_policy" "its" {
     "Version": "2012-10-17"
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy" "its-s3" {
-  count = "${length(var.s3_buckets)}"
+  count = length(var.s3_buckets)
   name  = "its-${var.environment}-s3-policy-${count.index}"
-  role  = "${aws_iam_role.its_task.name}"
+  role  = aws_iam_role.its_task.name
 
   policy = <<EOF
 {
@@ -84,4 +86,6 @@ resource "aws_iam_role_policy" "its-s3" {
     "Version": "2012-10-17"
 }
 EOF
+
 }
+

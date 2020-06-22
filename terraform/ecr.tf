@@ -14,3 +14,4 @@ resource "aws_ecr_repository" "its_ecr" {
     Creator = "Terraform"
   }
 }
+
