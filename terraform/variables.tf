@@ -20,11 +20,6 @@ variable "aws_region" {
 }
 
 
-variable "image_repo" {
-  type        = "string"
-  description = "docker repository name for ITS image"
-}
-
 variable "ssl_cert_arn" {
   type        = "string"
   description = "Amazon Resource Name for the ssl cert on the ITS load balancer"
