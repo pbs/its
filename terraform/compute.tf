@@ -29,6 +29,8 @@ resource "aws_ecs_service" "web" {
   name            = "its_${var.environment}_web_service"
   cluster         = var.ecs_cluster_id
   task_definition = aws_ecs_task_definition.web.arn
+  launch_type     = "FARGATE"
+
 
   desired_count = 2
 
