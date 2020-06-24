@@ -31,7 +31,7 @@
                         remote_tag=$docker_registry_preprod/$repository_staging:$TAG
                         remote_staging=$docker_registry_preprod/$repository_staging:qa
 
-                        docker build  --target production -t $repository_staging .
+                        docker build   -t $repository_staging .
 
                         docker tag $repository_staging:latest $remote_tag
                         docker tag $repository_staging:latest remote_staging
@@ -65,7 +65,7 @@
                             sh '''
                                 tag=$(cat /tmp/tag)
                                 ecs-deploy  -c STAGING \
-                                            -n its-staging \
+                                            -n its_staging_web_service \
                                             -i ${docker_registry_preprod}/${repository_staging}:${tag} \
                                             -r us-east-1 \
                                             -t 400
