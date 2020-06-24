@@ -11,19 +11,7 @@ resource "aws_iam_role" "its_task" {
             "Service": "ecs-tasks.amazonaws.com"
           },
           "Sid": ""
-        },
-        {
-                "Effect": "Allow",
-                "Action": [
-                    "ecr:GetAuthorizationToken",
-                    "ecr:BatchCheckLayerAvailability",
-                    "ecr:GetDownloadUrlForLayer",
-                    "ecr:BatchGetImage",
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents"
-                ],
-                "Resource": "*"
-         }
+        }
   ],
   "Version": "2008-10-17"
 }
@@ -99,5 +87,10 @@ resource "aws_iam_role_policy" "its-s3" {
 }
 EOF
 
+}
+
+resource "aws_iam_role_policy_attachment" "its_execution_policy_attachement" {
+  role       = aws_iam_role.its_task.id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
