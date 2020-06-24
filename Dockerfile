@@ -62,7 +62,6 @@ RUN pip install --user pipenv==2018.11.26 \
 COPY Pipfile Pipfile.lock /opt/its/
 
 RUN pipenv install --skip-lock --dev
-RUN pipenv lock --pre --clear
 
 # copy source code
 COPY --chown=its:its its/ /opt/its/its/
