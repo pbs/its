@@ -37,7 +37,7 @@
                         docker tag $repository_staging:latest remote_staging
 
                         docker push $remote_tag
-                        docker push remote_staging
+                        docker push $remote_staging
 
                         echo $TAG > /tmp/tag
                     '''
