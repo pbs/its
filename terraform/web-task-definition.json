@@ -7,7 +7,6 @@
     ],
     "essential": true,
     "image": "${image_repo}",
-    "hostname": "${hostname}",
     "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -23,7 +22,6 @@
     "memoryReservation": 800,
     "name": "web",
     "portMappings": [{
-        "containerPort": 5000,
-        "hostPort": 0
+        "containerPort": 5000
     }]
 }]
