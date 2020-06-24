@@ -34,7 +34,7 @@
                         docker build   -t $repository_staging .
 
                         docker tag $repository_staging:latest $remote_tag
-                        docker tag $repository_staging:latest remote_staging
+                        docker tag $repository_staging:latest $remote_staging
 
                         docker push $remote_tag
                         docker push $remote_staging
