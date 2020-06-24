@@ -4,14 +4,26 @@ resource "aws_iam_role" "its_task" {
   assume_role_policy = <<EOF
 {
   "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ecs-tasks.amazonaws.com"
-      },
-      "Sid": ""
-    }
+        {
+          "Action": "sts:AssumeRole",
+          "Effect": "Allow",
+          "Principal": {
+            "Service": "ecs-tasks.amazonaws.com"
+          },
+          "Sid": ""
+        },
+        {
+                "Effect": "Allow",
+                "Action": [
+                    "ecr:GetAuthorizationToken",
+                    "ecr:BatchCheckLayerAvailability",
+                    "ecr:GetDownloadUrlForLayer",
+                    "ecr:BatchGetImage",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                ],
+                "Resource": "*"
+         }
   ],
   "Version": "2008-10-17"
 }

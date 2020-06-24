@@ -12,6 +12,8 @@ data "template_file" "web_task_def" {
     log_group_name   = aws_cloudwatch_log_group.web.name
     hostname         = "its-${var.environment}"
     image_repo       = aws_ecr_repository.its_ecr.repository_url
+    cpu              = var.cpu
+    memory           = var.memory
     parameter_path = join(
       "",
       slice(split("parameter", var.parameter_store_path_arn), 1, 2),
@@ -26,8 +28,8 @@ resource "aws_ecs_task_definition" "web" {
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.its_task.arn
-  cpu                      = 256
-  memory                   = 512
+  cpu                      = var.cpu
+  memory                   = var.memory
 
 }
 

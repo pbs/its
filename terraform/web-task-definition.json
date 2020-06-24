@@ -1,5 +1,5 @@
 [{
-    "cpu": 256,
+    "cpu": "${cpu}",
     "entryPoint": [
         "/bin/bash",
         "-c",
@@ -19,7 +19,7 @@
         "name": "PARAMETER_PATH",
         "value": "${parameter_path}"
     }],
-    "memory": 512,
+    "memory": "${memory}",
     "name": "web",
     "portMappings": [{
         "containerPort": 5000

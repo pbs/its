@@ -77,5 +77,11 @@ variable "custom_capacity_provider" {
   type = string
 }
 
+variable "memory" {
+}
+
+variable "cpu" {
+}
+
 
 
