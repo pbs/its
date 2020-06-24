@@ -18,8 +18,7 @@
         "name": "PARAMETER_PATH",
         "value": "${parameter_path}"
     }],
-    "memory": 1600,
-    "memoryReservation": 800,
+    "memory": 512,
     "name": "web",
     "portMappings": [{
         "containerPort": 5000
