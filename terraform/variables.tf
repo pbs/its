@@ -73,5 +73,9 @@ variable "capacity_provider" {
    type  = string
 }
 
+variable "custom_capacity_provider" {
+  type = string
+}
+
 
 

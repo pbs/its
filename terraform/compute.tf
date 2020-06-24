@@ -30,7 +30,7 @@ resource "aws_ecs_service" "web" {
   name            = "its_${var.environment}_web_service"
   cluster         = var.ecs_cluster_id
   task_definition = aws_ecs_task_definition.web.arn
-
+  launch_type     = var.custom_capacity_provider == "yes" ? null : "FARGATE"
 
   desired_count = 2
 
@@ -53,9 +53,12 @@ resource "aws_ecs_service" "web" {
     ignore_changes = [desired_count]
   }
 
-  capacity_provider_strategy {
-    capacity_provider = "${var.capacity_provider}"
-    weight            = 100
+  dynamic "capacity_provider_strategy" {
+    for_each = var.custom_capacity_provider == "no" ? [] : [1]
+    content {
+      capacity_provider = var.capacity_provider
+      weight            = 100
+    }
   }
 }
 
