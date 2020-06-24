@@ -29,7 +29,7 @@
                         TAG="$DATE.$TIMESTAMP.$BRANCH_NAME.$GIT_SHA"
 
                         remote_tag=$docker_registry_preprod/$repository_staging:$TAG
-                        remote_staging=$docker_registry_preprod/$repository_staging:qa
+                        remote_staging=$docker_registry_preprod/$repository_staging:staging
 
                         docker build   -t $repository_staging .
 
