@@ -23,6 +23,7 @@ resource "aws_ecs_task_definition" "web" {
   family                = "its-web"
   task_role_arn         = aws_iam_role.its_task.arn
   container_definitions = data.template_file.web_task_def.rendered
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
 }
 
