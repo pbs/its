@@ -44,7 +44,7 @@ resource "aws_ecs_service" "web" {
 
   load_balancer {
     target_group_arn = aws_alb_target_group.its.arn
-    container_name   = "its-${var.environment}"
+    container_name   = "web"
     container_port   = 5000
   }
 
