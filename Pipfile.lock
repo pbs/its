@@ -480,7 +480,7 @@
             ],
             "index": "pypi",
             "version": "==1.2.0"
-        } 
+        },
         "pydocstyle": {
             "hashes": [
                 "sha256:04c84e034ebb56eb6396c820442b8c4499ac5eb94a3bda88951ac3dc519b6058",
