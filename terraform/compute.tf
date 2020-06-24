@@ -34,8 +34,6 @@ resource "aws_ecs_service" "web" {
 
   desired_count = 2
 
-  iam_role = "ecsServiceRole"
-
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 50
 
