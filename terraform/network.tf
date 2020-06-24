@@ -3,6 +3,7 @@ resource "aws_alb_target_group" "its" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
+  target_type = "ip"
 
   # controls how long load balancer holds onto obsolete containers before closing their connections -
   # shortening this tends to shorten deployment time. default is 300 seconds.
