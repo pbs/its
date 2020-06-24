@@ -23,13 +23,13 @@ resource "aws_ecs_task_definition" "web" {
   family                = "its-web"
   task_role_arn         = aws_iam_role.its_task.arn
   container_definitions = data.template_file.web_task_def.rendered
+  requires_compatibilities = ["FARGATE"]
 }
 
 resource "aws_ecs_service" "web" {
   name            = "its_${var.environment}_web_service"
   cluster         = var.ecs_cluster_id
   task_definition = aws_ecs_task_definition.web.arn
-  launch_type     = "FARGATE"
 
 
   desired_count = 2
@@ -51,6 +51,11 @@ resource "aws_ecs_service" "web" {
   # ignore changes to desired count so that deployments won't reset us to our minimum
   lifecycle {
     ignore_changes = [desired_count]
+  }
+
+  capacity_provider_strategy {
+    capacity_provider = "${var.capacity_provider}"
+    weight            = 100
   }
 }
 

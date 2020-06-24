@@ -69,5 +69,9 @@ variable "private_subnets" {
   description = "ids of subnets to which the load balancer should be attached"
 }
 
+variable "capacity_provider" {
+   type  = string
+}
+
 
 
