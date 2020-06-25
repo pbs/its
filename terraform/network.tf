@@ -29,7 +29,7 @@ resource "aws_alb_target_group" "its" {
 # this is just a fairly low-level way to foil the dumber port-scanners - if the connect without the right host header,
 # we send them to a target group with nothing listening, so they get a 503 or similar
 resource "aws_alb_target_group" "fallback" {
-  name     = "its-fallback-${var.environment}"
+  name     = "its-${var.environment}"
   port     = 5000
   protocol = "HTTP"
   vpc_id   = var.vpc_id
