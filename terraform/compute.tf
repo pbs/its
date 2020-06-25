@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "web" {
 ]
 DEFINITION
   tags = {
-    Name        = "urs-${var.environment}"
+    Name        = "its-${var.environment}"
     Environment = var.environment
     Creator     = "Terraform"
   }
