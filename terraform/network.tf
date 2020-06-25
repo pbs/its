@@ -159,7 +159,11 @@ resource "aws_alb_listener_rule" "its_http" {
     target_group_arn = aws_alb_target_group.its.arn
   }
 
- 
+  condition {
+    field = "host-header"
+
+    values = [var.allowed_host]
+  }
 }
 
 ############################################################################
