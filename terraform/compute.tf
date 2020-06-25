@@ -14,18 +14,18 @@ resource "aws_ecs_task_definition" "web" {
   cpu                      = var.cpu
   memory                   = var.memory
 
-    container_definitions = <<DEFINITION
+  container_definitions = <<DEFINITION
 [
   {
     "name": "web",
-    "image": aws_ecr_repository.its_ecr.repository_url,
+    "image": "${aws_ecr_repository.its_ecr.repository_url}",
     "cpu": ${var.cpu},
     "memory": ${var.memory},
     "essential": true,
     "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": aws_cloudwatch_log_group.web.name,
+          "awslogs-group": "${aws_cloudwatch_log_group.web.name}",
           "awslogs-region": "${var.aws_region}",
           "awslogs-stream-prefix": "ecs"
         }
