@@ -13,10 +13,6 @@ resource "aws_ecs_task_definition" "web" {
   execution_role_arn       = aws_iam_role.its_task.arn
   cpu                      = var.cpu
   memory                   = var.memory
-  parameter_path = join(
-      "",
-      slice(split("parameter", var.parameter_store_path_arn), 1, 2),
-    )
 
     container_definitions = <<DEFINITION
 [
@@ -35,7 +31,7 @@ resource "aws_ecs_task_definition" "web" {
         }
     },
     "environment": [
-      {"name": "PARAMETER_PATH", "value" : "${parameter_path}"}
+      {"name": "PARAMETER_PATH", "value" : "${var.parameter_path}"}
    ],
    "portMappings": [
       {

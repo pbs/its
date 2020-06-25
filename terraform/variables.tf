@@ -89,6 +89,9 @@ variable "route53_zone" {
 variable "route53_zone_name" {
 }
 
+variable "parameter_path" {
+}
+
 
 
 
