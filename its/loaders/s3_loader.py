@@ -7,6 +7,7 @@ from PIL import Image
 
 from ..errors import NotFoundError
 from ..settings import NAMESPACES
+from ..settings import  S3_BUCKET_FOLDER
 from ..util import validate_image_type
 from .base import BaseLoader
 
@@ -28,8 +29,10 @@ class S3Loader(BaseLoader):
         s3_resource = boto3.resource("s3")
 
         config = NAMESPACES[namespace]
+        s3_bucket_folder = S3_BUCKET_FOLDER
         path = config.get("path", namespace).strip("/")
-        key = "CORE/its-staging/{path}/{filename}".format(path=path, filename=filename).strip("/")
+        key = "{s3_bucket_folder}/{path}/{filename}".format(path=path, filename=filename,
+                                                            s3_bucket_folder=s3_bucket_folder).strip("/")
         bucket_name = config[S3Loader.parameter_name]
         s3_object = s3_resource.Object(bucket_name=bucket_name, key=key)
 
