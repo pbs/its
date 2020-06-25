@@ -4,32 +4,53 @@ resource "aws_cloudwatch_log_group" "web" {
 }
 
 # ECS task and service
-data "template_file" "web_task_def" {
-  template = file("${path.module}/web-task-definition.json")
-
-  vars = {
-    log_group_region = var.aws_region
-    log_group_name   = aws_cloudwatch_log_group.web.name
-    hostname         = "its-${var.environment}"
-    image_repo       = aws_ecr_repository.its_ecr.repository_url
-    cpu              = var.cpu
-    memory           = var.memory
-    parameter_path = join(
-      "",
-      slice(split("parameter", var.parameter_store_path_arn), 1, 2),
-    )
-  }
-}
 
 resource "aws_ecs_task_definition" "web" {
   family                = "its-web"
   task_role_arn         = aws_iam_role.its_task.arn
-  container_definitions = data.template_file.web_task_def.rendered
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.its_task.arn
   cpu                      = var.cpu
   memory                   = var.memory
+  parameter_path = join(
+      "",
+      slice(split("parameter", var.parameter_store_path_arn), 1, 2),
+    )
+
+    container_definitions = <<DEFINITION
+[
+  {
+    "name": "web",
+    "image": aws_ecr_repository.its_ecr.repository_url,
+    "cpu": ${var.cpu},
+    "memory": ${var.memory},
+    "essential": true,
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": aws_cloudwatch_log_group.web.name,
+          "awslogs-region": "${var.aws_region}",
+          "awslogs-stream-prefix": "ecs"
+        }
+    },
+    "environment": [
+      {"name": "PARAMETER_PATH", "value" : "${parameter_path}"}
+   ],
+   "portMappings": [
+      {
+        "containerPort": 5000
+      }
+   ],
+    "entryPoint": ["./scripts/docker/server/run-server.sh"]
+  }
+]
+DEFINITION
+  tags = {
+    Name        = "urs-${var.environment}"
+    Environment = var.environment
+    Creator     = "Terraform"
+  }
 
 }
 
