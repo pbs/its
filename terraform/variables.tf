@@ -83,5 +83,13 @@ variable "memory" {
 variable "cpu" {
 }
 
+var "route53_zone" {
+}
+
+var "route53_zone_name" {
+}
+
+
+
 
 

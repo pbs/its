@@ -87,6 +87,17 @@ resource "aws_security_group_rule" "its_lb_to_cluster" {
   security_group_id        = var.its_sg
 }
 
+
+resource "aws_security_group_rule" "its_sg_outbound_internet_access" {
+  description       = "allow all outound connections for its-${var.environment}"
+  type              = "egress"
+  protocol          = "-1"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = var.its_sg
+}
+
 resource "aws_alb" "its" {
   name            = "its-${var.environment}"
   subnets         = var.vpc_subnet_ids
@@ -151,5 +162,17 @@ resource "aws_alb_listener_rule" "its_http" {
 
     values = [var.allowed_host]
   }
+}
+
+############################################################################
+# Route53 DNS
+############################################################################
+
+resource "aws_route53_record" "its_dns" {
+  zone_id = var.route53_zone
+  name    = "its.${var.route53_zone_name}"
+  type    = "CNAME"
+  ttl     = "60"
+  records = [ aws_alb.its.dns_name ]
 }
 
