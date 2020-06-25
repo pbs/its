@@ -57,7 +57,7 @@ resource "aws_ecs_service" "web" {
 
   # ignore changes to desired count so that deployments won't reset us to our minimum
   lifecycle {
-    ignore_changes = [desired_count]
+    ignore_changes = [desired_count, lifecycle]
   }
 
   dynamic "capacity_provider_strategy" {

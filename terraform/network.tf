@@ -30,9 +30,11 @@ resource "aws_alb_target_group" "its" {
 # we send them to a target group with nothing listening, so they get a 503 or similar
 resource "aws_alb_target_group" "fallback" {
   name     = "its-fallback-${var.environment}"
-  port     = 80
+  port     = 5000
   protocol = "HTTP"
   vpc_id   = var.vpc_id
+  target_type = "ip"
+
 
   lifecycle {
     create_before_destroy = true
