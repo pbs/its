@@ -170,9 +170,16 @@ resource "aws_alb_listener_rule" "its_http" {
 # Route53 DNS
 ############################################################################
 
+locals {
+  its_dns = "its.${var.route53_zone_name}"
+}
+locals {
+  its_cdn_dns = "image.${var.route53_zone_name}"
+}
+
 resource "aws_route53_record" "its_dns" {
   zone_id = var.route53_zone
-  name    = "its.${var.route53_zone_name}"
+  name    = local.its_dns
   type    = "CNAME"
   ttl     = "60"
   records = [ aws_alb.its.dns_name ]
@@ -180,7 +187,7 @@ resource "aws_route53_record" "its_dns" {
 
 resource "aws_route53_record" "its_cloudfront_dns" {
   zone_id  = var.route53_zone
-  name     = "image.${var.route53_zone_name}"
+  name     = local.its_cdn_dns
   type     = "CNAME"
   ttl      = "300"
   records  = [aws_cloudfront_distribution.its_cloudfront_distribution.domain_name]
@@ -224,7 +231,7 @@ resource "aws_cloudfront_distribution" "its_cloudfront_distribution" {
     ssl_support_method       = "sni-only"
   }
 
-  aliases = [aws_route53_record.its_cloudfront_dns.name, aws_route53_record.its_dns.name]
+  aliases = [local.its_cdn_dns, local.its_dns]
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
