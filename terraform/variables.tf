@@ -91,6 +91,9 @@ variable "route53_zone_name" {
 
 variable "parameter_path" {
 }
+variable "cdn_headers" {
+  type        = list
+}
 
 
 

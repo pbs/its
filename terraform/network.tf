@@ -178,3 +178,71 @@ resource "aws_route53_record" "its_dns" {
   records = [ aws_alb.its.dns_name ]
 }
 
+resource "aws_route53_record" "its_cloudfront_dns" {
+  zone_id  = var.route53_zone
+  name     = "image.${var.route53_zone_name}"
+  type     = "CNAME"
+  ttl      = "300"
+  records  = [aws_cloudfront_distribution.its_cloudfront_distribution.domain_name]
+}
+############################################################################
+# Cloudfront Distribution
+############################################################################
+
+locals {
+  aws_cloudfront_distribution_origin_id = "alb-its-${var.environment}"
+}
+
+resource "aws_cloudfront_distribution" "its_cloudfront_distribution" {
+
+  origin {
+    domain_name = aws_alb.its.dns_name
+    origin_id   = local.aws_cloudfront_distribution_origin_id
+
+  custom_origin_config {
+    http_port = 80
+    https_port = 443
+    origin_keepalive_timeout = 5
+    origin_protocol_policy = "http-only"
+    origin_read_timeout = 30
+    origin_ssl_protocols = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+  }
+}
+
+  enabled         = true
+  price_class     = "PriceClass_100"
+  is_ipv6_enabled = true
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+  viewer_certificate {
+    acm_certificate_arn      = var.ssl_cert_arn
+    minimum_protocol_version = "TLSv1.2_2018"
+    ssl_support_method       = "sni-only"
+  }
+
+  aliases = [var.its_cdn]
+
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.aws_cloudfront_distribution_origin_id
+    default_ttl      = 0
+    compress         = true
+    
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+      headers = var.cdn_headers
+      
+    }
+
+    viewer_protocol_policy = "allow-all"
+  }
+}
