@@ -237,7 +237,8 @@ resource "aws_cloudfront_distribution" "its_cloudfront_distribution" {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = local.aws_cloudfront_distribution_origin_id
-    default_ttl      = 0
+    default_ttl      = var.default_ttl
+    max_ttl          = var.max_ttl
     compress         = true
     
     forwarded_values {

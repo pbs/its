@@ -97,6 +97,10 @@ variable "cdn_headers" {
 variable "cdn_aliases" {
   type        = list
 }
+variable "default_ttl" {
+}
+variable "max_ttl" {
+}
 
 
 
