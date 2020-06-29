@@ -231,7 +231,7 @@ resource "aws_cloudfront_distribution" "its_cloudfront_distribution" {
     ssl_support_method       = "sni-only"
   }
 
-  aliases = [var.allowed_host, "its.${var.route53_zone_name}"]
+  aliases = [var.allowed_host, "its.digi-preprod.pbs.org"]
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
