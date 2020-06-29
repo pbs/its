@@ -224,7 +224,7 @@ resource "aws_cloudfront_distribution" "its_cloudfront_distribution" {
     ssl_support_method       = "sni-only"
   }
 
-  aliases = [var.its_cdn]
+  aliases = [aws_route53_record.its_cloudfront_dns.name, aws_route53_record.its_dns.name]
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
