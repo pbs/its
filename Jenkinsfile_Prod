@@ -1,7 +1,7 @@
  pipeline {
     agent { label 'fat-worker' }
     environment {
-        docker_registry_preprod='476543043875.dkr.ecr.us-east-1.amazonaws.com'
+        docker_registry_prod='476543043875.dkr.ecr.us-east-1.amazonaws.com'
         repository_prod='its-prod'
         role   =credentials('jenkins-urs-prod')
     }
@@ -28,8 +28,8 @@
 
                         TAG="$DATE.$TIMESTAMP.$BRANCH_NAME.$GIT_SHA"
 
-                        remote_tag=$docker_registry_preprod/$repository_prod:$TAG
-                        remote_prod=$docker_registry_preprod/$repository_prod:prod
+                        remote_tag=$docker_registry_prod/$repository_prod:$TAG
+                        remote_prod=$docker_registry_prod/$repository_prod:prod
 
                         docker build   -t $repository_prod .
 
