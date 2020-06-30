@@ -1,7 +1,7 @@
  pipeline {
     agent { label 'fat-worker' }
     environment {
-        docker_registry_preprod='476543043875.dkr.ecr.us-east-1.amazonaws.com'
+        docker_registry_prod='476543043875.dkr.ecr.us-east-1.amazonaws.com'
         repository_prod='its-prod'
         role   =credentials('jenkins-urs-prod')
     }
