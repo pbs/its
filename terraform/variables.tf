@@ -94,6 +94,13 @@ variable "parameter_path" {
 variable "cdn_headers" {
   type        = list
 }
+variable "cdn_aliases" {
+  type        = list
+}
+variable "default_ttl" {
+}
+variable "max_ttl" {
+}
 
 
 
