@@ -20,7 +20,7 @@
                 script {
                     sh '''
                         eval "$(/usr/local/bin/aws ecr get-login --no-include-email --region=us-east-1  --registry-ids=242138130710)"
-                        /usr/local/bin/aws ecr batch-delete-image --repository-name $repository_staging --image-ids imageTag=qa --region=us-east-1
+                        /usr/local/bin/aws ecr batch-delete-image --repository-name $repository_staging --image-ids imageTag=staging --region=us-east-1
 
                         DATE=$(date --rfc-3339=date) || DATE=$(date "+%Y-%m-%d")
                         TIMESTAMP=$(date +%s)
