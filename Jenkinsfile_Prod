@@ -1,9 +1,9 @@
  pipeline {
     agent { label 'fat-worker' }
     environment {
-        docker_registry_preprod='242138130710.dkr.ecr.us-east-1.amazonaws.com'
-        repository_staging='its-staging'
-        role   =credentials('jenkins-urs-preprod')
+        docker_registry_preprod='476543043875.dkr.ecr.us-east-1.amazonaws.com'
+        repository_prod='its-prod'
+        role   =credentials('jenkins-urs-prod')
     }
     stages {
         stage('Checkout') {
@@ -28,16 +28,17 @@
 
                         TAG="$DATE.$TIMESTAMP.$BRANCH_NAME.$GIT_SHA"
 
-                        remote_tag=$docker_registry_preprod/$repository_staging:$TAG
-                        remote_staging=$docker_registry_preprod/$repository_staging:staging
+                        remote_tag=$docker_registry_preprod/$repository_prod:$TAG
+                        remote_prod=$docker_registry_preprod/$repository_prod:prod
 
-                        docker build   -t $repository_staging .
+                        docker build   -t $repository_prod .
 
-                        docker tag $repository_staging:latest $remote_tag
-                        docker tag $repository_staging:latest $remote_staging
+                        docker tag $repository_prod:latest $remote_tag
+                        docker tag $repository_prod:latest $remote_prod
+
 
                         docker push $remote_tag
-                        docker push $remote_staging
+                        docker push $remote_prod
 
                         echo $TAG > /tmp/tag
                     '''
@@ -64,9 +65,9 @@
                         script {
                             sh '''
                                 tag=$(cat /tmp/tag)
-                                ecs-deploy  -c STAGING \
-                                            -n its_staging_web_service \
-                                            -i ${docker_registry_preprod}/${repository_staging}:${tag} \
+                                ecs-deploy  -c PROD \
+                                            -n its_prod_web_service \
+                                            -i ${docker_registry_prod}/${repository_prod}:${tag} \
                                             -r us-east-1 \
                                             -t 400
                             '''
