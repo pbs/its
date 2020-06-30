@@ -19,7 +19,7 @@
                 withAWS(credentials: 'jenkins-urs', region: 'us-east-1', role: "${env.role}"){
                 script {
                     sh '''
-                        eval "$(/usr/local/bin/aws ecr get-login --no-include-email --region=us-east-1  --registry-ids=242138130710)"
+                        eval "$(/usr/local/bin/aws ecr get-login --no-include-email --region=us-east-1  --registry-ids=476543043875)"
                         /usr/local/bin/aws ecr batch-delete-image --repository-name $repository_prod --image-ids imageTag=prod --region=us-east-1
 
                         DATE=$(date --rfc-3339=date) || DATE=$(date "+%Y-%m-%d")
