@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "its_s3" {
-  for_each = var.environment == "qa" ? [1] : []
+  for_each = var.environment == "staging" ? [1] : []
   bucket   = "pbs.its-${var.environment}.storage.${var.account}"
   acl      = "private"
 
