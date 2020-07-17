@@ -1,0 +1,79 @@
+ pipeline {
+    agent { label 'fat-worker' }
+    environment {
+        docker_registry_preprod='242138130710.dkr.ecr.us-east-1.amazonaws.com'
+        repository_staging='its-staging'
+        role   =credentials('jenkins-urs-preprod')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+               cleanWs()
+               checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building Docker Container...'
+                withAWS(credentials: 'jenkins-urs', region: 'us-east-1', role: "${env.role}"){
+                script {
+                    sh '''
+                        eval "$(/usr/local/bin/aws ecr get-login --no-include-email --region=us-east-1  --registry-ids=242138130710)"
+                        /usr/local/bin/aws ecr batch-delete-image --repository-name $repository_staging --image-ids imageTag=staging --region=us-east-1
+
+                        DATE=$(date --rfc-3339=date) || DATE=$(date "+%Y-%m-%d")
+                        TIMESTAMP=$(date +%s)
+                        GIT_SHA=$(git rev-parse --short HEAD)
+
+                        TAG="$DATE.$TIMESTAMP.$BRANCH_NAME.$GIT_SHA"
+
+                        remote_tag=$docker_registry_preprod/$repository_staging:$TAG
+                        remote_staging=$docker_registry_preprod/$repository_staging:staging
+
+                        docker build   -t $repository_staging .
+
+                        docker tag $repository_staging:latest $remote_tag
+                        docker tag $repository_staging:latest $remote_staging
+
+                        docker push $remote_tag
+                        docker push $remote_staging
+
+                        echo $TAG > /tmp/tag
+                    '''
+                }
+                echo 'Building Docker Container... Complete !'
+
+                }
+            }
+        }
+
+        stage ('install ecs-deploy') {
+            steps {
+                sh '''
+                  sudo curl -o /usr/bin/ecs-deploy https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy
+                  sudo chmod +x /usr/bin/ecs-deploy
+                '''
+            }
+         }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    withAWS(credentials: 'jenkins-urs', region: 'us-east-1', role: "${env.role}") {
+                        script {
+                            sh '''
+                                tag=$(cat /tmp/tag)
+                                ecs-deploy  -c STAGING \
+                                            -n its_staging_web_service \
+                                            -i ${docker_registry_preprod}/${repository_staging}:${tag} \
+                                            -r us-east-1 \
+                                            -t 400
+                            '''
+                        }
+                    }
+                }
+            }
+    }
+}
+}

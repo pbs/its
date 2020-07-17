@@ -4,47 +4,85 @@ resource "aws_cloudwatch_log_group" "web" {
 }
 
 # ECS task and service
-data "template_file" "web_task_def" {
-  template = "${file("${path.module}/web-task-definition.json")}"
-
-  vars {
-    log_group_region = "${var.aws_region}"
-    log_group_name   = "${aws_cloudwatch_log_group.web.name}"
-    hostname         = "its-${var.environment}"
-    image_repo       = "${var.image_repo}"
-    image_tag        = "${var.image_tag}"
-
-    parameter_path = "${join("", slice(split("parameter", var.parameter_store_path_arn), 1, 2))}"
-  }
-}
 
 resource "aws_ecs_task_definition" "web" {
   family                = "its-web"
-  task_role_arn         = "${aws_iam_role.its_task.arn}"
-  container_definitions = "${data.template_file.web_task_def.rendered}"
+  task_role_arn         = aws_iam_role.its_task.arn
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.its_task.arn
+  cpu                      = var.cpu
+  memory                   = var.memory
+
+  container_definitions = <<DEFINITION
+[
+  {
+    "name": "web",
+    "image": "${aws_ecr_repository.its_ecr.repository_url}",
+    "cpu": ${var.cpu},
+    "memory": ${var.memory},
+    "essential": true,
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "${aws_cloudwatch_log_group.web.name}",
+          "awslogs-region": "${var.aws_region}",
+          "awslogs-stream-prefix": "ecs"
+        }
+    },
+    "environment": [
+      {"name": "PARAMETER_PATH", "value" : "${var.parameter_path}"}
+   ],
+   "portMappings": [
+      {
+        "containerPort": 5000
+      }
+   ],
+    "entryPoint": ["./scripts/docker/server/run-server.sh"]
+  }
+]
+DEFINITION
+  tags = {
+    Name        = "its-${var.environment}"
+    Environment = var.environment
+    Creator     = "Terraform"
+  }
+
 }
 
 resource "aws_ecs_service" "web" {
   name            = "its_${var.environment}_web_service"
-  cluster         = "${var.ecs_cluster_id}"
-  task_definition = "${aws_ecs_task_definition.web.arn}"
+  cluster         = var.ecs_cluster_id
+  task_definition = aws_ecs_task_definition.web.arn
+  launch_type     = var.custom_capacity_provider == "yes" ? null : "FARGATE"
 
   desired_count = 2
-
-  iam_role = "ecsServiceRole"
 
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 50
 
   load_balancer {
-    target_group_arn = "${aws_alb_target_group.its.id}"
+    target_group_arn = aws_alb_target_group.its.arn
     container_name   = "web"
-    container_port   = "5000"
+    container_port   = 5000
+  }
+
+  network_configuration {
+    security_groups = [var.its_sg]
+    subnets         = var.private_subnets
   }
 
   # ignore changes to desired count so that deployments won't reset us to our minimum
   lifecycle {
-    ignore_changes = ["desired_count"]
+    ignore_changes = [desired_count, task_definition]
+  }
+
+  dynamic "capacity_provider_strategy" {
+    for_each = var.custom_capacity_provider == "no" ? [] : [1]
+    content {
+      capacity_provider = var.capacity_provider
+      weight            = 100
+    }
   }
 }
 
@@ -52,11 +90,11 @@ resource "aws_ecs_service" "web" {
 
 resource "aws_appautoscaling_target" "web" {
   resource_id        = "service/${var.ecs_cluster_name}/${aws_ecs_service.web.name}"
-  role_arn           = "${var.ecs_service_autoscale_role_arn}"
+  role_arn           = var.ecs_service_autoscale_role_arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
   min_capacity       = 2
-  max_capacity       = "${var.container_scaling_limit}"
+  max_capacity       = var.container_scaling_limit
 }
 
 resource "aws_appautoscaling_policy" "its_web_scale_up" {
@@ -78,7 +116,7 @@ resource "aws_appautoscaling_policy" "its_web_scale_up" {
     }
   }
 
-  depends_on = ["aws_appautoscaling_target.web"]
+  depends_on = [aws_appautoscaling_target.web]
 }
 
 resource "aws_appautoscaling_policy" "its_web_scale_down" {
@@ -100,7 +138,7 @@ resource "aws_appautoscaling_policy" "its_web_scale_down" {
     }
   }
 
-  depends_on = ["aws_appautoscaling_target.web"]
+  depends_on = [aws_appautoscaling_target.web]
 }
 
 # these two alarms are essentially an OR for scaling up - either will trigger scaling
@@ -114,11 +152,11 @@ resource "aws_cloudwatch_metric_alarm" "its_web_cpu_high" {
   period              = "60"
   statistic           = "Average"
   threshold           = "80"
-  alarm_actions       = ["${aws_appautoscaling_policy.its_web_scale_up.arn}"]
+  alarm_actions       = [aws_appautoscaling_policy.its_web_scale_up.arn]
 
-  dimensions {
-    ClusterName = "${var.ecs_cluster_name}"
-    ServiceName = "${aws_ecs_service.web.name}"
+  dimensions = {
+    ClusterName = var.ecs_cluster_name
+    ServiceName = aws_ecs_service.web.name
   }
 }
 
@@ -132,11 +170,11 @@ resource "aws_cloudwatch_metric_alarm" "its_web_memory_high" {
   period              = "60"
   statistic           = "Average"
   threshold           = "80"
-  alarm_actions       = ["${aws_appautoscaling_policy.its_web_scale_up.arn}"]
+  alarm_actions       = [aws_appautoscaling_policy.its_web_scale_up.arn]
 
-  dimensions {
-    ClusterName = "${var.ecs_cluster_name}"
-    ServiceName = "${aws_ecs_service.web.name}"
+  dimensions = {
+    ClusterName = var.ecs_cluster_name
+    ServiceName = aws_ecs_service.web.name
   }
 }
 
@@ -153,10 +191,11 @@ resource "aws_cloudwatch_metric_alarm" "its_web_cpu_low" {
   period              = "60"
   statistic           = "Average"
   threshold           = "30"
-  alarm_actions       = ["${aws_appautoscaling_policy.its_web_scale_down.arn}"]
+  alarm_actions       = [aws_appautoscaling_policy.its_web_scale_down.arn]
 
-  dimensions {
-    ClusterName = "${var.ecs_cluster_name}"
-    ServiceName = "${aws_ecs_service.web.name}"
+  dimensions = {
+    ClusterName = var.ecs_cluster_name
+    ServiceName = aws_ecs_service.web.name
   }
 }
+

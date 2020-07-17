@@ -1,72 +1,61 @@
 variable "vpc_id" {
-  type        = "string"
+  type        = string
   description = "id of the Virtual Private Cloud network in which to create resources"
 }
 
 variable "environment" {
-  type        = "string"
+  type        = string
   description = "tag for environment, such as prod, staging or qa"
 }
 
 variable "s3_buckets" {
-  type        = "list"
+  type        = list
   description = "names for the S3 buckets ITS will use to store images"
 }
 
 variable "aws_region" {
-  type        = "string"
+  type        = string
   default     = "us-east-1"
   description = "the name of the AWS region in which to create resources"
 }
 
-variable "image_tag" {
-  type        = "string"
-  description = "docker image tag for ITS image"
-}
-
-variable "image_repo" {
-  type        = "string"
-  default     = "pbsd/its"
-  description = "docker repository name for ITS image"
-}
-
 variable "ssl_cert_arn" {
-  type        = "string"
+  type        = string
   description = "Amazon Resource Name for the ssl cert on the ITS load balancer"
 }
 
 variable "ecs_cluster_name" {
-  type        = "string"
+  type        = string
   description = "name of ECS cluster in which to run containers"
 }
 
 variable "ecs_cluster_id" {
-  type        = "string"
+  type        = string
   description = "id of ECS cluster in which to run containers"
 }
 
 variable "allowed_host" {
-  type        = "string"
+  type        = string
   description = "hostname for incoming web traffic"
 }
 
 variable "parameter_store_path_arn" {
-  type        = "string"
+  type        = string
   description = "Amazon Resource Name for parameter store path (where the application will look for configuration)"
 }
 
 variable "ecs_service_autoscale_role_arn" {
-  type        = "string"
+  type        = string
   description = "Amazon Resource Name for the IAM role ECS should use when autoscaling"
 }
 
 variable "vpc_subnet_ids" {
-  type        = "list"
+  type        = list
   description = "ids of subnets to which the load balancer should be attached"
 }
 
-variable "cluster_instance_sg" {
-  type        = "string"
+variable "its_sg" {
+  type        = string
   description = "security group id for ECS cluster instances"
 }
 
@@ -74,3 +63,48 @@ variable "container_scaling_limit" {
   default     = 8
   description = "limit to the autoscaling behavior of the ECS service"
 }
+
+variable "private_subnets" {
+  type        = list
+  description = "ids of subnets to which the load balancer should be attached"
+}
+
+variable "capacity_provider" {
+   type  = string
+}
+
+variable "custom_capacity_provider" {
+  type = string
+}
+
+variable "memory" {
+}
+
+variable "cpu" {
+}
+
+variable "route53_zone" {
+}
+
+variable "route53_zone_name" {
+}
+
+variable "parameter_path" {
+}
+variable "cdn_headers" {
+  type        = list
+}
+variable "cdn_aliases" {
+  type        = list
+}
+variable "default_ttl" {
+}
+variable "max_ttl" {
+}
+variable "account"{
+}
+
+
+
+
+

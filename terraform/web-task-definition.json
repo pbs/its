@@ -6,24 +6,22 @@
         "exec ./scripts/docker/server/run-server.sh"
     ],
     "essential": true,
-    "image": "${image_repo}:${image_tag}",
-    "hostname": "${hostname}",
+    "image": "${image_repo}",
     "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
             "awslogs-group": "${log_group_name}",
-            "awslogs-region": "${log_group_region}"
+            "awslogs-region": "${log_group_region}",
+            "awslogs-stream-prefix": "ecs"
         }
     },
     "environment": [{
         "name": "PARAMETER_PATH",
         "value": "${parameter_path}"
     }],
-    "memory": 1600,
-    "memoryReservation": 800,
+    "memory": 512,
     "name": "web",
     "portMappings": [{
-        "containerPort": 5000,
-        "hostPort": 0
+        "containerPort": 5000
     }]
 }]

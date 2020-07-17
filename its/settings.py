@@ -43,6 +43,7 @@ NAMESPACES = json.JSONDecoder().decode(
     s=os.environ.get("ITS_BACKENDS", DEFAULT_NAMESPACES)
 )
 
+
 DEFAULT_OVERLAYS = json.dumps({"passport": "tests/images/logo.png"})
 
 OVERLAYS = json.JSONDecoder().decode(s=os.environ.get("ITS_OVERLAYS", DEFAULT_OVERLAYS))
