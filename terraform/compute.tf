@@ -56,7 +56,7 @@ resource "aws_ecs_service" "web" {
   task_definition = aws_ecs_task_definition.web.arn
   launch_type     = var.custom_capacity_provider == "yes" ? null : "FARGATE"
 
-  desired_count = 2
+  desired_count = var.desired_count
 
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 50

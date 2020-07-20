@@ -103,6 +103,9 @@ variable "max_ttl" {
 }
 variable "account"{
 }
+variable "desired_count"{
+  
+}
 
 
 
