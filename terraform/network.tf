@@ -167,32 +167,6 @@ resource "aws_alb_listener_rule" "its_http" {
 }
 
 ############################################################################
-# Route53 DNS
-############################################################################
-
-locals {
-  its_dns = "its.${var.route53_zone_name}"
-}
-locals {
-  its_cdn_dns = "image.${var.route53_zone_name}"
-}
-
-resource "aws_route53_record" "its_dns" {
-  zone_id = var.route53_zone
-  name    = local.its_dns
-  type    = "CNAME"
-  ttl     = "60"
-  records = [ aws_alb.its.dns_name ]
-}
-
-resource "aws_route53_record" "its_cloudfront_dns" {
-  zone_id  = var.route53_zone
-  name     = local.its_cdn_dns
-  type     = "CNAME"
-  ttl      = "300"
-  records  = [aws_cloudfront_distribution.its_cloudfront_distribution.domain_name]
-}
-############################################################################
 # Cloudfront Distribution
 ############################################################################
 
