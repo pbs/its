@@ -93,7 +93,7 @@ resource "aws_appautoscaling_target" "web" {
   role_arn           = var.ecs_service_autoscale_role_arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-  min_capacity       = 2
+  min_capacity       = var.min_capacity
   max_capacity       = var.container_scaling_limit
 }
 

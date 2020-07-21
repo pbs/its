@@ -10,9 +10,9 @@ resource "aws_alb_target_group" "its" {
   deregistration_delay = 150
 
   health_check {
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 10
+    timeout             = 29
     path                = "/"
     protocol            = "HTTP"
     interval            = 30
@@ -227,7 +227,7 @@ resource "aws_cloudfront_distribution" "its_cloudfront_distribution" {
   }
   viewer_certificate {
     acm_certificate_arn      = var.ssl_cert_arn
-    minimum_protocol_version = "TLSv1.2_2018"
+    minimum_protocol_version = "TLSv1.2_2019"
     ssl_support_method       = "sni-only"
   }
 
