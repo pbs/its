@@ -10,9 +10,9 @@ resource "aws_alb_target_group" "its" {
   deregistration_delay = 150
 
   health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 10
-    timeout             = 29
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    timeout             = 5
     path                = "/"
     protocol            = "HTTP"
     interval            = 30
