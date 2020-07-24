@@ -69,26 +69,24 @@ variable "private_subnets" {
   description = "ids of subnets to which the load balancer should be attached"
 }
 
-variable "capacity_provider" {
+variable "capacity_provider_1" {
+   type  = string
+}
+variable "capacity_provider_2" {
    type  = string
 }
 
-variable "custom_capacity_provider" {
+variable "fargate_spot_capacity_provider" {
   type = string
 }
-
+variable "fargate_capacity_provider" {
+  type = string
+}
 variable "memory" {
 }
 
 variable "cpu" {
 }
-
-variable "route53_zone" {
-}
-
-variable "route53_zone_name" {
-}
-
 variable "parameter_path" {
 }
 variable "cdn_headers" {
@@ -103,7 +101,10 @@ variable "max_ttl" {
 }
 variable "account"{
 }
-
+variable "desired_count"{
+}
+variable "min_capacity"{
+}
 
 
 

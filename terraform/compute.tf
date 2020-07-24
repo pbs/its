@@ -54,9 +54,9 @@ resource "aws_ecs_service" "web" {
   name            = "its_${var.environment}_web_service"
   cluster         = var.ecs_cluster_id
   task_definition = aws_ecs_task_definition.web.arn
-  launch_type     = var.custom_capacity_provider == "yes" ? null : "FARGATE"
+  launch_type     = var.fargate_spot_capacity_provider == "yes" ? null : "FARGATE"
 
-  desired_count = 2
+  desired_count = var.desired_count
 
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 50
@@ -78,10 +78,17 @@ resource "aws_ecs_service" "web" {
   }
 
   dynamic "capacity_provider_strategy" {
-    for_each = var.custom_capacity_provider == "no" ? [] : [1]
+    for_each = var.fargate_spot_capacity_provider == "no" ? [] : [1]
     content {
-      capacity_provider = var.capacity_provider
-      weight            = 100
+      capacity_provider = var.capacity_provider_1
+      weight            = 1
+    }
+  }
+  dynamic "capacity_provider_strategy" {
+    for_each = var.fargate_capacity_provider == "no" ? [] : [1]
+    content {
+      capacity_provider = var.capacity_provider_2
+      weight            = 1
     }
   }
 }
@@ -93,7 +100,7 @@ resource "aws_appautoscaling_target" "web" {
   role_arn           = var.ecs_service_autoscale_role_arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-  min_capacity       = 2
+  min_capacity       = var.min_capacity
   max_capacity       = var.container_scaling_limit
 }
 
@@ -108,7 +115,7 @@ resource "aws_appautoscaling_policy" "its_web_scale_up" {
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
     cooldown                = 120
-    metric_aggregation_type = "Average"
+    metric_aggregation_type = "Maximum"
 
     step_adjustment {
       metric_interval_lower_bound = 0
@@ -130,7 +137,7 @@ resource "aws_appautoscaling_policy" "its_web_scale_down" {
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
     cooldown                = 120
-    metric_aggregation_type = "Average"
+    metric_aggregation_type = "Maximum"
 
     step_adjustment {
       metric_interval_upper_bound = 0
@@ -141,61 +148,41 @@ resource "aws_appautoscaling_policy" "its_web_scale_down" {
   depends_on = [aws_appautoscaling_target.web]
 }
 
-# these two alarms are essentially an OR for scaling up - either will trigger scaling
-resource "aws_cloudwatch_metric_alarm" "its_web_cpu_high" {
-  alarm_name          = "its-${var.environment}-web-cpu-utilization-high"
-  alarm_description   = "This alarm monitors its web CPU utilization for scaling up"
+resource "aws_cloudwatch_metric_alarm" "its_web_requests_high" {
+  alarm_name          = "its-${var.environment}-web-RequestCountPerTarget-high"
+  alarm_description   = "Scales up app containers based on RequestCountPerTarget metric"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "4"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/ECS"
+  evaluation_periods  = "2"
+  datapoints_to_alarm = "2"
+  metric_name         = "RequestCountPerTarget"
+  namespace           = "AWS/ApplicationELB"
   period              = "60"
-  statistic           = "Average"
-  threshold           = "80"
+  statistic           = "Sum"
+  threshold           = "60"
   alarm_actions       = [aws_appautoscaling_policy.its_web_scale_up.arn]
 
   dimensions = {
-    ClusterName = var.ecs_cluster_name
-    ServiceName = aws_ecs_service.web.name
+    "TargetGroup"  = "${replace("${aws_alb_target_group.its.arn}", "/arn:.*?:targetgroup\\/(.*)/", "targetgroup/$1")}"
+    "LoadBalancer" = "${replace("${aws_alb.its.arn}", "/arn:.*?:loadbalancer\\/(.*)/", "$1")}"
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "its_web_memory_high" {
-  alarm_name          = "its-${var.environment}-web-memory-utilization-high"
-  alarm_description   = "This alarm monitors its web memory utilization for scaling up"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "4"
-  metric_name         = "MemoryUtilization"
-  namespace           = "AWS/ECS"
+resource "aws_cloudwatch_metric_alarm" "its_web_requests_low" {
+  alarm_name          = "its-${var.environment}-web-RequestCountPerTarget-low"
+  alarm_description   = "Scales down app containers based on RequestCountPerTarget metric"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "2"
+  datapoints_to_alarm = "2"
+  metric_name         = "RequestCountPerTarget"
+  namespace           = "AWS/ApplicationELB"
   period              = "60"
-  statistic           = "Average"
-  threshold           = "80"
-  alarm_actions       = [aws_appautoscaling_policy.its_web_scale_up.arn]
-
-  dimensions = {
-    ClusterName = var.ecs_cluster_name
-    ServiceName = aws_ecs_service.web.name
-  }
-}
-
-# scale down alarms - you can't AND on cloudwatch metrics / app autoscaling,
-# so we have to pick one. low cpu seems like a reasonable flag
-
-resource "aws_cloudwatch_metric_alarm" "its_web_cpu_low" {
-  alarm_name          = "its-${var.environment}-web-cpu-utilization-low"
-  alarm_description   = "This alarm monitors its web CPU utilization for scaling down"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/ECS"
-  period              = "60"
-  statistic           = "Average"
+  statistic           = "Sum"
   threshold           = "30"
   alarm_actions       = [aws_appautoscaling_policy.its_web_scale_down.arn]
 
   dimensions = {
-    ClusterName = var.ecs_cluster_name
-    ServiceName = aws_ecs_service.web.name
+    "TargetGroup"  = "${replace("${aws_alb_target_group.its.arn}", "/arn:.*?:targetgroup\\/(.*)/", "targetgroup/$1")}"
+    "LoadBalancer" = "${replace("${aws_alb.its.arn}", "/arn:.*?:loadbalancer\\/(.*)/", "$1")}"
   }
 }
 
