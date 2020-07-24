@@ -157,7 +157,7 @@ resource "aws_cloudwatch_metric_alarm" "its_web_requests_high" {
   namespace           = "AWS/ApplicationELB"
   period              = "60"
   statistic           = "Sum"
-  threshold           = "30"
+  threshold           = "60"
   alarm_actions       = [aws_appautoscaling_policy.its_web_scale_up.arn]
 
   dimensions = {
@@ -175,7 +175,7 @@ resource "aws_cloudwatch_metric_alarm" "its_web_requests_low" {
   namespace           = "AWS/ApplicationELB"
   period              = "60"
   statistic           = "Sum"
-  threshold           = "15"
+  threshold           = "30"
   alarm_actions       = [aws_appautoscaling_policy.its_web_scale_down.arn]
 
   dimensions = {
