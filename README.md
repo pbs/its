@@ -125,6 +125,16 @@ Where:
 - WW -- a numerical pixel value representing the desired width of the output image
 - HH -- a numerical pixel value representing the desired height of the output image
 
+Resize has an option to not scale up, if the provided width and/or height is larger than those of the image. Use the `resize` keyword, but add **a comma and a third** argument `no-scale-up`:
+
+> https://image.pbs.org/path/to/file.jpg?resize=WWxHH,no-scale-up
+
+Or, with missing height:
+> https://image.pbs.org/path/to/file.jpg?resize=WWx,no-scale-up
+
+Or, with missing width:
+> https://image.pbs.org/path/to/file.jpg?resize=xHH,no-scale-up
+
 Note: Resizing to a larger size isn’t recommended, as it will compromise image quality.
 
 Note: Inputing a single value (either an expected width size or an expected height size followed by an 'x') is also supported.

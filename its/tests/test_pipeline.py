@@ -230,12 +230,58 @@ class TestResizeTransform(TestCase):
         comparison = compare_pixels(expected, actual)
         self.assertGreaterEqual(comparison, self.threshold)
 
+    def test_resize_integrity_smaller_noscaleup(self):
+        test_image = Image.open(self.img_dir / "test.png")
+        test_image.info["filename"] = "test.png"
+        query = {"resize": "100x100,no-scale-up"}
+        expected = Image.open(self.img_dir / "expected/test_resize.png")
+        actual = process_transforms(test_image, query)
+        # no-scale-up doesn't change
+        assert actual.width == expected.width
+        assert actual.height == expected.height
+        comparison = compare_pixels(expected, actual)
+        self.assertGreaterEqual(comparison, self.threshold)
+
     def test_resize_integrity_larger(self):
         test_image = Image.open(self.img_dir / "test.png")
         test_image.info["filename"] = "test.png"
         query = {"resize": "700x550"}
         expected = Image.open(self.img_dir / "expected/test_resize_700x550.png")
         actual = process_transforms(test_image, query)
+        comparison = compare_pixels(expected, actual)
+        self.assertGreaterEqual(comparison, self.threshold)
+
+    def test_resize_integrity_larger_noscaleup(self):
+        test_image = Image.open(self.img_dir / "logo.png")
+        test_image.info["filename"] = "logo.png"
+        query = {"resize": "700x700,no-scale-up"}
+        # image doesn't scale up, so expect no change
+        expected = Image.open(self.img_dir / "logo.png")
+        actual = process_transforms(test_image, query)
+        comparison = compare_pixels(expected, actual)
+        assert actual.width == expected.width
+        assert actual.height == expected.height
+        self.assertGreaterEqual(comparison, self.threshold)
+
+    def test_resize_integrity_larger_noscaleup_width_only(self):
+        test_image = Image.open(self.img_dir / "seagull.jpg")
+        test_image.info["filename"] = "seagull.jpg"
+        query = {"resize": "1600x,no-scale-up"}
+        expected = Image.open(self.img_dir / "seagull.jpg")
+        actual = process_transforms(test_image, query)
+        assert actual.width == expected.width
+        assert actual.height == expected.height
+        comparison = compare_pixels(expected, actual)
+        self.assertGreaterEqual(comparison, self.threshold)
+
+    def test_resize_integrity_larger_noscaleup_height_only(self):
+        test_image = Image.open(self.img_dir / "seagull.jpg")
+        test_image.info["filename"] = "seagull.jpg"
+        query = {"resize": "x992,no-scale-up"}
+        expected = Image.open(self.img_dir / "seagull.jpg")
+        actual = process_transforms(test_image, query)
+        assert actual.width == expected.width
+        assert actual.height == expected.height
         comparison = compare_pixels(expected, actual)
         self.assertGreaterEqual(comparison, self.threshold)
 

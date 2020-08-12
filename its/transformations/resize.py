@@ -21,8 +21,11 @@ class ResizeTransform(BaseTransform):
         """
         Resizes input image while maintaining aspect ratio.
         """
+        option = ''
         if len(parameters) == 2:
             width, height = parameters
+        elif len(parameters) == 3:
+            width, height, option = parameters
         else:
             raise ITSClientError(
                 "Missing width or height. Both width and height are required"
@@ -69,6 +72,13 @@ class ResizeTransform(BaseTransform):
             # make sure target is at least one pixel wide
             tgt_width = max(floor(img.width * ratio), 1)
             tgt_height = max(floor(img.height * ratio), 1)
+
+        if option == 'no-scale-up' and (
+                tgt_width > img.width or
+                tgt_height > img.height
+            ):
+            tgt_height = img.height
+            tgt_width = img.width
 
         resized = img.resize([tgt_width, tgt_height], Image.ANTIALIAS)
 
