@@ -21,7 +21,7 @@ class ResizeTransform(BaseTransform):
         """
         Resizes input image while maintaining aspect ratio.
         """
-        option = ''
+        option = ""
         if len(parameters) == 2:
             width, height = parameters
         elif len(parameters) == 3:
@@ -73,10 +73,9 @@ class ResizeTransform(BaseTransform):
             tgt_width = max(floor(img.width * ratio), 1)
             tgt_height = max(floor(img.height * ratio), 1)
 
-        if option == 'no-scale-up' and (
-                tgt_width > img.width or
-                tgt_height > img.height
-            ):
+        if option == "no-scale-up" and (
+            tgt_width > img.width or tgt_height > img.height
+        ):
             tgt_height = img.height
             tgt_width = img.width
 
