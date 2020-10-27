@@ -1,6 +1,9 @@
 import json
 import os
 
+from newrelic.agent import NewRelicContextFormatter
+
+
 # Set DEBUG = True to enable debugging application.
 DEBUG = os.environ.get("ITS_DEBUG", "false").lower() == "true"
 
@@ -60,3 +63,40 @@ SENTRY_DSN = os.environ.get("ITS_SENTRY_DSN")
 CORS_ORIGINS = os.environ.get(
     "ITS_CORS_ORIGINS", "www.example.com,another.example.com"
 ).split(",")
+
+# Logging dictionary to be used for dictConfig
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[%(asctime)s] %(levelname)s - %(name)s - %(message)s'
+        },
+        'newrelic': {
+            '()': NewRelicContextFormatter
+        },
+    },
+    'root': {
+        'level': 'DEBUG',
+        'class': 'logging.StreamHandler',
+        'handlers': ['console', 'newrelic'],
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'formatter': 'verbose',
+            'class': 'logging.StreamHandler',
+        },
+        'newrelic': {
+            'level': 'DEBUG',
+            'formatter': 'newrelic',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'newrelic': {
+            'propagate': True,
+            'level': 'ERROR',
+        },
+    }
+}

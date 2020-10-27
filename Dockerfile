@@ -54,14 +54,12 @@ USER its
 ENV PATH /home/its/.local/bin:$PATH
 
 # install runtime requirements
-# TODO once this is fixed we can go back to latest stable pipenv
-# https://github.com/pypa/pipenv/issues/3026
-RUN pip install --user pipenv==2018.11.26 \
+RUN pip install --user pipenv \
   && pipenv --three
 
 COPY Pipfile Pipfile.lock /opt/its/
 
-RUN pipenv install --skip-lock --dev
+RUN pipenv install --dev
 
 # copy source code
 COPY --chown=its:its its/ /opt/its/its/

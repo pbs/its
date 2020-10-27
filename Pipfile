@@ -19,7 +19,7 @@ jinja2 = ">=2.10.1" # https://nvd.nist.gov/vuln/detail/CVE-2019-10906
 werkzeug = ">=0.15.3" # https://nvd.nist.gov/vuln/detail/CVE-2019-14806
 
 [dev-packages]
-"flake8" = "<3.6.0"  # flake8 3.6.0 has dependency incompatibilities with prospector 1.1.4
+"flake8" = "*"
 pytest = "*"
 black = "*"
 isort = "*"
