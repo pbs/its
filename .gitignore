@@ -107,3 +107,6 @@ type_info.json
 
 # pytest
 .pytest_cache
+
+# PyCharm
+.idea

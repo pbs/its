@@ -5,6 +5,7 @@ import logging.config
 from io import BytesIO
 from typing import Dict, Optional
 
+import boto3
 import sentry_sdk
 from flask import Flask, abort, redirect, request
 from flask_cors import CORS
@@ -162,6 +163,30 @@ def process_old_request(  # pylint: disable=too-many-arguments
         query[transform] = query[transform] + "x" + str(y_coordinate)
 
     return query
+
+
+@APP.route("/upload.<namespace>", methods=["POST"])
+def upload_image(namespace: str) -> Response:
+    if namespace not in NAMESPACES:
+        abort(400, f"{namespace} is not a configured namespace.")
+
+    if not request.files:
+        abort(400, "Please provide an image to upload.")
+    image_file = request.files['file']
+    if image_file.filename.rsplit('.', 1)[-1].upper() not in MIME_TYPES:
+        abort(400, "Invalid file format")
+
+    config = NAMESPACES[namespace]
+    path = config.get("path", namespace).strip("/")
+    key = f"{path}/{image_file.filename}".strip("/")
+    bucket_name = config["bucket"]
+    client = boto3.client('s3')
+    return client.put_object(
+        Body=image_file,
+        Bucket=bucket_name,
+        Key=key,
+        ACL='public-read',
+    )
 
 
 @APP.route("/<namespace>/<path:filename>", methods=["GET"])
