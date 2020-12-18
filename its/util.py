@@ -1,4 +1,5 @@
 from flask import request
+import boto3
 
 from .errors import ITSInvalidImageFileError
 from .settings import MIME_TYPES, NAMESPACES
@@ -29,3 +30,13 @@ def validate_image_type(image):
         raise ITSInvalidImageFileError("invalid image file")
 
     return image
+
+
+def upload_to_s3(image_file, bucket_name, key):
+    client = boto3.client('s3')
+    client.put_object(
+        Body=image_file,
+        Bucket=bucket_name,
+        Key=key,
+        ACL='public-read',
+    )

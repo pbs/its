@@ -5,23 +5,22 @@ import logging.config
 from io import BytesIO
 from typing import Dict, Optional
 
-import boto3
 import sentry_sdk
+from PIL import ImageFile, JpegImagePlugin
 from flask import Flask, abort, redirect, request
 from flask_cors import CORS
-from PIL import ImageFile, JpegImagePlugin
 from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug import Response
 
+from its.auth import login_required
 from its.errors import ITSClientError, NotFoundError
 from its.loader import loader
 from its.normalize import NormalizationError, normalize
 from its.optimize import optimize
 from its.pipeline import process_transforms
-from its.settings import MIME_TYPES
-
-from .settings import CORS_ORIGINS, NAMESPACES, SENTRY_DSN, LOGGING
-from .util import get_redirect_location
+from its.settings import MIME_TYPES, CORS_ORIGINS, LOGGING, NAMESPACES, \
+    SENTRY_DSN
+from its.util import get_redirect_location, upload_to_s3
 
 # https://stackoverflow.com/questions/12984426/python-pil-ioerror-image-file-truncated-with-big-images
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -166,27 +165,23 @@ def process_old_request(  # pylint: disable=too-many-arguments
 
 
 @APP.route("/upload.<namespace>", methods=["POST"])
+@login_required
 def upload_image(namespace: str) -> Response:
-    if namespace not in NAMESPACES:
-        abort(400, f"{namespace} is not a configured namespace.")
-
     if not request.files:
         abort(400, "Please provide an image to upload.")
     image_file = request.files['file']
     if image_file.filename.rsplit('.', 1)[-1].upper() not in MIME_TYPES:
-        abort(400, "Invalid file format")
+        abort(400, "Invalid image format.")
 
     config = NAMESPACES[namespace]
     path = config.get("path", namespace).strip("/")
     key = f"{path}/{image_file.filename}".strip("/")
     bucket_name = config["bucket"]
-    client = boto3.client('s3')
-    return client.put_object(
-        Body=image_file,
-        Bucket=bucket_name,
-        Key=key,
-        ACL='public-read',
-    )
+    try:
+        upload_to_s3(image_file, bucket_name, key)
+    except Exception as e:
+        abort(400, f"Upload error: '{e}'")
+    return Response(status=204)
 
 
 @APP.route("/<namespace>/<path:filename>", methods=["GET"])

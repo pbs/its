@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 
 
@@ -25,3 +27,10 @@ def pytest_sessionfinish(session, exitstatus):
     from pyannotate_runtime import collect_types
 
     collect_types.dump_stats("type_info.json")
+
+
+@pytest.fixture(scope='session', autouse=True)
+def mock_s3_upload():
+    upload_to_s3 = 'its.util.upload_to_s3'
+    with mock.patch(upload_to_s3) as s3_upload:
+        yield s3_upload
