@@ -19,7 +19,7 @@ class S3Loader(BaseLoader):
     parameter_name = "bucket"
 
     @staticmethod
-    def get_fileobj(namespace, filename):
+    def get_fileobj(namespace, filename, fallback=False):
         """
         Given a namespace (or directory name) and a filename,
         returns a file-like or bytes-like object.
@@ -30,7 +30,10 @@ class S3Loader(BaseLoader):
         config = NAMESPACES[namespace]
         path = config.get("path", namespace).strip("/")
         key = "{path}/{filename}".format(path=path, filename=filename).strip("/")
-        bucket_name = config[S3Loader.parameter_name]
+        if fallback:
+            bucket_name = config['fallback_bucket']
+        else:
+            bucket_name = config[S3Loader.parameter_name]
         s3_object = s3_resource.Object(bucket_name=bucket_name, key=key)
 
         # create an empty bytes object to store the image bytes in
@@ -40,16 +43,20 @@ class S3Loader(BaseLoader):
         return file_obj
 
     @staticmethod
-    def load_image(namespace, filename):
+    def load_image(namespace, filename, fallback=False):
         """
         Loads image from AWS S3 bucket.
         """
         try:
-            file_obj = S3Loader.get_fileobj(namespace, filename)
+            file_obj = S3Loader.get_fileobj(namespace, filename, fallback)
         except ClientError as error:
             error_code = error.response["Error"]["Code"]
 
             if error_code == "404":
+                if not fallback and NAMESPACES[namespace].get(
+                        'fallback_bucket'):
+                    return S3Loader.load_image(
+                        namespace, filename, fallback=True)
                 raise NotFoundError("An error occurred: '%s'" % str(error))
 
             # S3 can return 403 errors if the application lacks ListBucket
