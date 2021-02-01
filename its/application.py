@@ -164,9 +164,8 @@ def process_old_request(  # pylint: disable=too-many-arguments
     return query
 
 
-@APP.route("/upload.<namespace>", methods=["POST"])
 @login_required
-def upload_image(namespace: str) -> Response:
+def upload_image(request, namespace: str) -> Response:
     if not request.files:
         abort(400, "Please provide an image to upload.")
     image_file = request.files['file']
@@ -184,12 +183,17 @@ def upload_image(namespace: str) -> Response:
     return Response(status=204)
 
 
-@APP.route("/<namespace>/<path:filename>", methods=["GET"])
+@APP.route("/<namespace>/<path:filename>", methods=["GET", "POST"])
 def transform_image(namespace: str, filename: str) -> Response:
     """ New ITS image transform command """
-    query = request.args.to_dict()
-    result = process_request(namespace, query, filename)
-    return result
+    if request.method == "GET":
+        query = request.args.to_dict()
+        result = process_request(namespace, query, filename)
+        return result
+    elif filename == "upload":
+        return upload_image(request, namespace=namespace)
+    else:
+        abort(405, "Method not allowed")
 
 
 # Old ITS Support

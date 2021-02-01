@@ -15,7 +15,7 @@ class TestUpload(TestCase):
 
     def test_missing_image(self):
         response = self.client.post(
-            "/upload.test",
+            "/test/upload",
             content_type='multipart/form-data',
             headers={"Authorization": "dGVzdDp0ZXN0"}
         )
@@ -25,7 +25,7 @@ class TestUpload(TestCase):
 
     def test_invalid_image_format(self):
         response = self.client.post(
-            "/upload.test",
+            "/test/upload",
             data={'file': (io.BytesIO(b"test"), 'test.invalid')},
             content_type='multipart/form-data',
             headers={"Authorization": "dGVzdDp0ZXN0"}
@@ -35,7 +35,7 @@ class TestUpload(TestCase):
 
     def test_successful_upload(self):
         response = self.client.post(
-            "/upload.test",
+            "/test/upload",
             data={'file': (io.BytesIO(b"test"), 'test.jpg')},
             content_type='multipart/form-data',
             headers={"Authorization": "dGVzdDp0ZXN0"}
